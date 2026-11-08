@@ -1,0 +1,96 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src 'none'; form-action 'none'; object-src 'none'; base-uri 'self'">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>FPLN Download Machine</title>
+<link rel="icon" href="../favicon.ico">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Chakra+Petch:wght@500;600;700&display=swap">
+<style>
+:root{--bg:#060b14;--panel:rgba(14,24,42,.78);--line:rgba(255,255,255,.1);--fg:#eef4fa;--dim:#9fb2c6;--faint:#6f8196;--gold:#e2bd74;--gold2:#f6dca2;--sky:#8fd6ff;--ok:#9fe3b4;
+  --fd:"Chakra Petch","Segoe UI",system-ui,sans-serif;--fb:"Barlow","Segoe UI",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:radial-gradient(110% 50% at 50% 0%,#15274a,var(--bg) 70%) var(--bg);color:var(--fg);font:400 16px/1.55 var(--fb);min-height:100vh}
+.wrap{width:min(920px,100%);margin:0 auto;padding:0 max(16px,env(safe-area-inset-right,0px)) 70px max(16px,env(safe-area-inset-left,0px))}
+nav{display:flex;align-items:center;gap:12px;padding:20px 0}nav img{width:34px;height:34px;border-radius:9px}nav b{font:700 17px/1 var(--fd);letter-spacing:.16em}nav .sp{flex:1}
+nav a{color:var(--dim);text-decoration:none;font:600 13px/1 var(--fd);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;margin-left:14px}nav a:hover{color:var(--fg)}
+.machine{margin-top:20px;padding:34px;border-radius:26px;background:linear-gradient(180deg,rgba(20,33,58,.9),rgba(10,18,34,.92));border:1px solid rgba(226,189,116,.4);box-shadow:0 40px 90px -40px #000,inset 0 1px 0 rgba(255,255,255,.06);position:relative;overflow:hidden}
+.machine::after{content:"";position:absolute;left:-40%;right:-40%;bottom:0;height:70px;transform:perspective(160px) rotateX(55deg);transform-origin:50% 100%;background:repeating-linear-gradient(90deg,rgba(143,214,255,.16) 0 1px,transparent 1px 46px);-webkit-mask-image:linear-gradient(transparent,#000);mask-image:linear-gradient(transparent,#000);pointer-events:none}
+.kick{font:600 12px/1 var(--fd);letter-spacing:.28em;color:var(--gold);text-transform:uppercase;margin:0 0 12px}
+h1{margin:0 0 10px;font:700 clamp(34px,6vw,56px)/1 var(--fd)}
+h1 span{background:linear-gradient(180deg,#fff,#e8eef5 55%,var(--gold2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{margin:0 0 26px;color:#c3d1de;max-width:36em}
+.go{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:16px;padding:20px 30px 20px 24px;border-radius:16px;background:linear-gradient(180deg,var(--gold2),#d5a95c);color:#1a1205;box-shadow:0 18px 40px -14px rgba(226,189,116,.75),inset 0 1px 0 rgba(255,255,255,.55);transition:transform .15s}
+.go:hover{transform:translateY(-2px)}.go:focus-visible{outline:3px solid var(--sky);outline-offset:4px}
+.go svg{width:28px;height:28px}.go b{display:block;font:800 19px/1 var(--fd);letter-spacing:.12em;text-transform:uppercase}.go small{display:block;font:600 12px/1 var(--fd);letter-spacing:.14em;opacity:.7;margin-top:7px}
+.belt{position:relative;z-index:1;list-style:none;margin:28px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.belt li{padding:12px 12px 12px 40px;border-radius:12px;background:rgba(0,0,0,.25);border:1px solid var(--line);position:relative;font:600 13.5px/1.25 var(--fd);letter-spacing:.04em;color:var(--dim);transition:border-color .3s,color .3s,background .3s}
+.belt li::before{content:"";position:absolute;left:12px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;border:2px solid rgba(255,255,255,.2)}
+.belt li.run{color:var(--fg);border-color:rgba(143,214,255,.5)}.belt li.run::before{border-color:var(--sky);border-top-color:transparent;animation:spin .7s linear infinite}
+.belt li.ok{color:var(--fg);border-color:rgba(159,227,180,.5);background:rgba(159,227,180,.06)}
+.belt li.ok::before{border-color:var(--ok);background:var(--ok) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4L18 8' fill='none' stroke='%23062012' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px no-repeat}
+@keyframes spin{to{transform:rotate(360deg)}}
+#done{display:none;position:relative;z-index:1;margin-top:18px;padding:14px 16px;border-radius:12px;background:rgba(159,227,180,.08);border:1px solid rgba(159,227,180,.35);color:#d9f3e2;max-width:40em}
+#done.on{display:block}#done b{color:#fff}
+h2{font:700 22px/1.2 var(--fd);letter-spacing:.03em;margin:54px 0 6px}
+.sub{color:var(--dim);margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.card{padding:20px;border-radius:16px;background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.card h3{margin:0;font:700 16px/1.2 var(--fd);letter-spacing:.06em;text-transform:uppercase;color:var(--gold2)}
+.card ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.card li a,.card li span.x{display:flex;justify-content:space-between;gap:12px;padding:8px 10px;margin:0 -10px;border-radius:9px;color:var(--fg);text-decoration:none}
+.card li a:hover{background:rgba(255,255,255,.06)}.card li a:focus-visible{outline:2px solid var(--sky)}
+.card li small{color:var(--faint);white-space:nowrap}
+.card li a small::after{content:" ↓";color:var(--sky)}.card li a.ext small::after{content:" ↗"}
+footer{margin-top:50px;color:var(--faint);font-size:13.5px}
+@media (max-width:760px){.belt{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}.machine{padding:24px 18px}.go{width:100%;justify-content:center}nav a.h{display:none}}
+@media (prefers-reduced-motion:reduce){.belt li.run::before{animation:none}.go{transition:none}}
+</style></head><body><div class="wrap">
+<nav><img src="../icons/icon-192.png" alt=""><b>FPLN</b><span class="sp"></span><a class="h" href="../share/">Share</a><a class="h" href="../builder/">Page builder</a><a href="../download/">Install page</a></nav>
+
+<div class="machine">
+  <p class="kick">FPLN · Download machine</p>
+  <h1><span>Everything.</span> One click.</h1>
+  <p class="lead">The installer, the overnight-alarm helper, every banner, badge and QR code, the email banners, the share message, screenshots and shortcuts to every FPLN page. One zip, always the latest.</p>
+  <a class="go" id="go" href="FPLN-kit.zip" download="FPLN-kit.zip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Download everything</b><small id="sz">FPLN-kit.zip · 1.3 MB</small></span></a>
+  <ul class="belt" id="belt"><li>Installer</li><li>Alarm helper</li><li>Banners &amp; badges</li><li>QR code</li><li>Email banners</li><li>Share message</li><li>Shortcuts</li><li>Screenshots</li></ul>
+  <div id="done" role="status" aria-live="polite"><b>Downloaded.</b> Open it from your Downloads folder, click <b>Extract all</b>, then start with <b>README.txt</b>. To install FPLN, open <b>1 Install FPLN</b> › <b>Install FPLN</b>.</div>
+</div>
+
+<h2>Or grab one thing</h2><p class="sub">Everything in the zip, one file at a time.</p>
+<div class="grid">
+  <div class="card"><h3>Install</h3><ul>
+    <li><a href="../download/FPLN-beta.zip" download>Windows installer + alarm helper <small>.zip · 96 KB</small></a></li>
+    <li><a class="ext" href="../download/">Install page (one click) <small>page</small></a></li>
+  </ul></div>
+  <div class="card"><h3>Share</h3><ul>
+    <li><a href="../share/banner.png" download="FPLN-banner.png">Banner <small>.png</small></a></li>
+    <li><a href="../share/badge.png" download="FPLN-badge.png">Badge, navy <small>.png</small></a></li>
+    <li><a href="../share/badge-gold.png" download="FPLN-badge-gold.png">Badge, gold <small>.png</small></a></li>
+    <li><a href="../share/qr.png" download="FPLN-QR.png">QR code <small>.png</small></a></li>
+    <li><a href="../share/og.png" download="FPLN-link-preview.png">Link preview card <small>.png</small></a></li>
+    <li><a class="ext" href="../share/#email">Email banners (copy &amp; paste) <small>page</small></a></li>
+  </ul></div>
+  <div class="card"><h3>Screenshots</h3><ul>
+    <li><a href="../download/shot-desktop.png" download="FPLN-laptop.png">FPLN on a laptop <small>.png</small></a></li>
+    <li><a href="../download/shot-phone.png" download="FPLN-phone.png">FPLN on a phone <small>.png</small></a></li>
+  </ul></div>
+  <div class="card"><h3>Your tools</h3><ul>
+    <li><a class="ext" href="../builder/">Page builder <small>page</small></a></li>
+    <li><a class="ext" href="../share/">Share kit <small>page</small></a></li>
+    <li><a class="ext" href="../">FPLN app <small>page</small></a></li>
+  </ul></div>
+</div>
+<footer>The zip is rebuilt automatically whenever FPLN's banners, installer or share files change.</footer>
+</div>
+<script>
+(function(){
+  var go = document.getElementById("go"), items = [].slice.call(document.querySelectorAll("#belt li")), busy = false;
+  fetch("kit.json", {cache:"no-store"}).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ if(j && j.bytes) document.getElementById("sz").textContent = "FPLN-kit.zip · " + (j.bytes / 1048576).toFixed(1) + " MB"; }).catch(function(){});
+  go.addEventListener("click", function(){
+    if(busy) return; busy = true; var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    items.forEach(function(li){ li.className = ""; });
+    items.forEach(function(li, i){ setTimeout(function(){ li.className = "run"; setTimeout(function(){ li.className = "ok"; if(i === items.length - 1){ document.getElementById("done").classList.add("on"); busy = false; } }, reduce ? 0 : 260); }, reduce ? 0 : i * 170); });
+  });
+})();
+</script>
+</body></html>
