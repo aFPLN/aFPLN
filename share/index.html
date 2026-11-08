@@ -66,6 +66,10 @@ code{display:block;font:12.5px/1.5 ui-monospace,monospace;background:rgba(0,0,0,
 <div class="chip"><img src="../icons/icon-192.png" alt=""><a id="lnk" href="../get/"><b>Get FPLN</b> <span>· one-click install link</span></a><button type="button" class="btn pri" data-copy="link"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>Copy link</button></div>
 <div class="row"><button type="button" class="btn gh" id="shr" hidden>Share…</button><button type="button" class="btn gh" data-copy="msg">Copy a ready-made message</button></div>
 
+<section><h2>Banner</h2><p class="sub">The big one. “Copy for email” copies it as a clickable banner: paste it into an email, a Teams post or a Google Doc and anyone can click it to install FPLN.</p>
+<div class="card"><div class="pv" style="padding:18px"><a href="../get/"><img src="banner.png" alt="FPLN: Own the day. Alarm. Planner. Assistant. Get FPLN." width="1200" height="300" style="width:600px"></a></div>
+  <div class="row"><button type="button" class="btn pri" data-copy="badge" data-img="banner.png" data-w="600" data-h="150">Copy for email</button><a class="btn gh" href="banner.png" download="FPLN-banner.png">Download PNG</a><button type="button" class="btn gh" data-copy="html" data-img="banner.png" data-w="600" data-h="150">Copy HTML</button></div></div></section>
+
 <section><h2>Badges</h2><p class="sub">“Copy for email” copies the badge as a clickable picture: paste it into Gmail, Outlook, Teams or a Google Doc.</p>
 <div class="grid">
   <div class="card"><div class="pv"><a href="../get/"><img src="badge.png" alt="Install FPLN · Flight Plan, beta 1" width="600" height="176"></a></div>
@@ -98,23 +102,23 @@ Free, updates itself, and everything stays on your own device. I’m beta testin
   var URL_ = "https://braveheart30.github.io/FPLN-/get", BASE = "https://braveheart30.github.io/FPLN-/share/";
   var t = document.getElementById("toast"), tt = 0;
   function toast(s){ t.textContent = s; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(function(){ t.classList.remove("on"); }, 1800); }
-  function badgeHTML(img){ return '<a href="'+URL_+'"><img src="'+BASE+img+'" alt="Install FPLN · Flight Plan (beta)" width="300" height="88" style="border:0;width:300px;height:auto"></a>'; }
+  function badgeHTML(img, w, h){ w = w||300; h = h||88; return '<a href="'+URL_+'"><img src="'+BASE+img+'" alt="Get FPLN: Own the day. Alarm. Planner. Assistant." width="'+w+'" height="'+h+'" style="border:0;width:'+w+'px;max-width:100%;height:auto"></a>'; }
   function plain(s, done){ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(s).then(function(){ toast(done); }, function(){ fallback(s, done); }); } else fallback(s, done); }
   function fallback(s, done){ var ta = document.createElement("textarea"); ta.value = s; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select();
     try{ document.execCommand("copy"); toast(done); }catch(e){ toast("Press Ctrl+C to copy"); } ta.remove(); }
-  function rich(img){ var h = badgeHTML(img);
+  function rich(img, w, hh){ var h = badgeHTML(img, w, hh);
     try{ if(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write){
-      navigator.clipboard.write([new ClipboardItem({"text/html": new Blob([h], {type:"text/html"}), "text/plain": new Blob([URL_], {type:"text/plain"})})]).then(function(){ toast("Badge copied. Paste it into your email"); }, function(){ richFallback(h); });
+      navigator.clipboard.write([new ClipboardItem({"text/html": new Blob([h], {type:"text/html"}), "text/plain": new Blob([URL_], {type:"text/plain"})})]).then(function(){ toast("Copied. Paste it into your email"); }, function(){ richFallback(h); });
       return; } }catch(e){}
     richFallback(h); }
   function richFallback(h){ var d = document.createElement("div"); d.contentEditable = "true"; d.innerHTML = h; d.style.position = "fixed"; d.style.opacity = "0"; document.body.appendChild(d);
     var r = document.createRange(); r.selectNodeContents(d); var s = getSelection(); s.removeAllRanges(); s.addRange(r);
-    try{ document.execCommand("copy"); toast("Badge copied. Paste it into your email"); }catch(e){ toast("Couldn’t copy here; use Download PNG"); } s.removeAllRanges(); d.remove(); }
+    try{ document.execCommand("copy"); toast("Copied. Paste it into your email"); }catch(e){ toast("Couldn’t copy here; use Download PNG"); } s.removeAllRanges(); d.remove(); }
   document.addEventListener("click", function(e){ var b = e.target.closest("[data-copy]"); if(!b) return; var k = b.dataset.copy;
     if(k==="link") plain(URL_, "Link copied");
     else if(k==="msg") plain(document.getElementById("msgT").textContent, "Message copied");
-    else if(k==="badge") rich(b.dataset.img);
-    else if(k==="html") plain(badgeHTML(b.dataset.img), "HTML copied"); });
+    else if(k==="badge") rich(b.dataset.img, b.dataset.w, b.dataset.h);
+    else if(k==="html") plain(badgeHTML(b.dataset.img, b.dataset.w, b.dataset.h), "HTML copied"); });
   var sh = document.getElementById("shr");
   if(navigator.share){ sh.hidden = false; sh.onclick = function(){ navigator.share({title:"FPLN · Flight Plan", text:"Install FPLN, the cadet planner, in one click:", url:URL_}).catch(function(){}); }; }
   var big = document.getElementById("big");
