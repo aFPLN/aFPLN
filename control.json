@@ -1,18 +1,24 @@
 {
   "v": 1,
-  "rev": "clear-banner-20261104-152033",
+  "rev": "banner-20261108-030237",
   "kill": {
     "state": "none",
     "id": "R-20261102-043736",
     "msg": ""
   },
-  "off": [],
-  "banner": null,
-  "updated": "2026-11-04T15:20:33+00:00",
+  "off": [
+    "eric"
+  ],
+  "banner": {
+    "id": "B-20261108-030237",
+    "text": "Eric is off for a safety check. Your planner is safe on this device.",
+    "level": "info"
+  },
+  "updated": "2026-11-08T03:02:37+00:00",
   "by": "autosecure",
   "autosecure": {
     "device": true
   },
-  "at_off": 1793805633368,
-  "at_banner": 1793805633400
+  "at_off": 1794106957698,
+  "at_banner": 1794106957743
 }

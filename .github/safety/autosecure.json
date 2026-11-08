@@ -2,8 +2,19 @@
   "v": 1,
   "enabled": true,
   "device": true,
-  "applied": {},
-  "banner": null,
+  "applied": {
+    "eric": {
+      "at": 1794106957698,
+      "sig": [
+        "A2"
+      ]
+    }
+  },
+  "banner": {
+    "text": "Eric is off for a safety check. Your planner is safe on this device.",
+    "at": 1794106957698,
+    "kind": "contain"
+  },
   "overridden": {},
   "history": [
     {
@@ -93,15 +104,24 @@
     {
       "at": "2026-11-07T05:05:50+00:00",
       "what": "reported only (no feature to switch off): P2"
+    },
+    {
+      "at": "2026-11-08T03:02:37+00:00",
+      "what": "switched off Eric for every cadet: A2"
+    },
+    {
+      "at": "2026-11-08T03:02:37+00:00",
+      "what": "safety-check banner: Eric"
     }
   ],
-  "checked": "2026-11-07T05:05:50+00:00",
+  "checked": "2026-11-08T03:02:37+00:00",
   "last": {
-    "failures": {},
+    "failures": {
+      "eric": [
+        "A2"
+      ]
+    },
     "advisory": [],
-    "unmapped": [
-      "P1",
-      "P2"
-    ]
+    "unmapped": []
   }
 }
