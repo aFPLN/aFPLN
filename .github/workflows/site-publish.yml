@@ -1,0 +1,27 @@
+name: FPLN page builder publish
+# When site.json changes on main (from the FPLN page builder), check it and put it live.
+on:
+  push:
+    branches: [main]
+    paths: [site.json]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: fpln-pages-publish
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check site.json
+        run: python3 .github/safety/sitecheck.py site.json
+      - name: Safety scan
+        run: python3 .github/safety/guard.py --root .
+      - name: Publish
+        run: git push -f origin HEAD:gh-pages
+      - name: Summary
+        run: echo "### FPLN install page updated from the page builder. Live in about a minute." >> "$GITHUB_STEP_SUMMARY"

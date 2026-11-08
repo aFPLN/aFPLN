@@ -1,0 +1,179 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src 'self'; form-action 'none'; object-src 'none'; base-uri 'self'">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>FPLN Page Builder</title>
+<link rel="icon" href="../favicon.ico">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Chakra+Petch:wght@500;600;700&display=swap">
+<style>
+:root{--bg:#070c16;--panel:#0d1729;--panel2:#111d33;--line:rgba(255,255,255,.1);--fg:#eef4fa;--dim:#9fb2c6;--faint:#6f8196;--gold:#e2bd74;--gold2:#f6dca2;--sky:#8fd6ff;--ok:#9fe3b4;--bad:#ff8a7a;
+  --fd:"Chakra Petch","Segoe UI",system-ui,sans-serif;--fb:"Barlow","Segoe UI",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--fg);font:400 14.5px/1.5 var(--fb);display:grid;grid-template-rows:auto minmax(0,1fr)}
+header{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);background:var(--panel)}
+header img{width:30px;height:30px;border-radius:8px}
+header b{font:700 15px/1 var(--fd);letter-spacing:.16em}
+header small{font:600 11px/1 var(--fd);letter-spacing:.2em;color:var(--gold);text-transform:uppercase}
+header .sp{flex:1}
+#state{font-size:13px;color:var(--faint)}#state.dirty{color:var(--gold2)}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:10px 15px;border-radius:10px;font:700 12.5px/1 var(--fd);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.pri{background:linear-gradient(180deg,#f6dca2,#d5a95c);color:#1a1205}
+.gh{border:1px solid rgba(255,255,255,.2);color:var(--fg)}.gh:hover{border-color:rgba(255,255,255,.4)}
+.btn:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+main{display:grid;grid-template-columns:minmax(340px,430px) minmax(0,1fr);min-height:0}
+#form{overflow:auto;border-right:1px solid var(--line);padding:6px 0 80px}
+details.grp{border-bottom:1px solid var(--line)}
+details.grp > summary{cursor:pointer;list-style:none;padding:14px 18px;font:700 13px/1 var(--fd);letter-spacing:.16em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+details.grp > summary::-webkit-details-marker{display:none}
+details.grp > summary::after{content:"+";color:var(--gold);font-size:18px}details.grp[open] > summary::after{content:"–"}
+.fields{display:flex;flex-direction:column;gap:12px;padding:0 18px 18px}
+label.f{display:flex;flex-direction:column;gap:5px;font:600 11.5px/1.2 var(--fd);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+label.f em{font:400 12px/1.35 var(--fb);letter-spacing:0;text-transform:none;color:var(--faint);font-style:normal}
+input[type=text],textarea{font:400 14.5px/1.4 var(--fb);color:var(--fg);background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:9px;padding:9px 11px;width:100%;letter-spacing:normal;text-transform:none}
+textarea{resize:vertical;min-height:62px}
+input:focus,textarea:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(143,214,255,.18)}
+.pair{display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}
+.pair .hd{display:flex;align-items:center;gap:6px;font:600 11px/1 var(--fd);letter-spacing:.14em;color:var(--faint);text-transform:uppercase}
+.pair .hd .sp{flex:1}
+.mini{all:unset;cursor:pointer;width:26px;height:26px;display:grid;place-items:center;border-radius:7px;color:var(--dim);font:600 14px/1 var(--fb)}
+.mini:hover{background:rgba(255,255,255,.08);color:var(--fg)}.mini:focus-visible{outline:2px solid var(--sky)}
+.colors{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.colors label{display:flex;flex-direction:column;gap:6px;font:600 11px/1.2 var(--fd);letter-spacing:.1em;color:var(--dim);text-transform:uppercase}
+input[type=color]{width:100%;height:40px;border:1px solid rgba(255,255,255,.18);border-radius:9px;background:none;padding:2px;cursor:pointer}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:9px;background:var(--panel2);border:1px solid var(--line)}
+.tog input{width:20px;height:20px;accent-color:var(--gold)}
+#pv{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0;background:#03060c}
+#pvbar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line)}
+#pvbar .seg{display:flex;border:1px solid rgba(255,255,255,.18);border-radius:10px;overflow:hidden}
+#pvbar .seg button{all:unset;cursor:pointer;padding:8px 12px;font:600 12px/1 var(--fd);letter-spacing:.1em;color:var(--dim)}
+#pvbar .seg button[aria-pressed=true]{background:rgba(143,214,255,.15);color:var(--fg)}
+#pvbar small{color:var(--faint);margin-left:auto}
+#stage{overflow:auto;display:flex;justify-content:center;padding:16px}
+#frame{border:0;background:#060b14;width:100%;height:100%;min-height:600px;border-radius:10px;box-shadow:0 0 0 1px var(--line)}
+#stage.phone #frame{width:390px;height:780px;flex:none;border-radius:28px;box-shadow:0 0 0 10px #151b26,0 0 0 11px rgba(255,255,255,.12)}
+#modal{position:fixed;inset:0;background:rgba(2,4,9,.78);display:none;place-items:center;padding:16px;z-index:5}
+#modal.on{display:grid}
+.mbox{width:min(560px,100%);background:var(--panel);border:1px solid rgba(226,189,116,.4);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:14px;max-height:100%;overflow:auto}
+.mbox h2{margin:0;font:700 22px/1.2 var(--fd)}
+.mbox ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;counter-reset:s}
+.mbox li{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start}
+.mbox li::before{counter-increment:s;content:counter(s);width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:#1a1205;font:700 14px/1 var(--fd)}
+.mbox li div{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.mbox p{margin:0;color:var(--dim)}
+.mbox a.btn{text-decoration:none}
+#chk{font-size:13.5px;padding:10px 12px;border-radius:10px}#chk.ok{background:rgba(159,227,180,.08);color:var(--ok)}#chk.bad{background:rgba(255,138,122,.1);color:var(--bad)}
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,16px);opacity:0;transition:.2s;background:#0d1729;border:1px solid rgba(159,227,180,.5);color:var(--ok);padding:11px 16px;border-radius:11px;font:600 13.5px/1 var(--fd);pointer-events:none;z-index:9}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@media (max-width:860px){body{display:block;height:auto}main{display:flex;flex-direction:column-reverse}#form{border-right:0;overflow:visible}#pv{height:70vh}header{flex-wrap:wrap}}
+</style></head><body>
+<header><img src="../icons/icon-192.png" alt=""><div><b>FPLN</b><br><small>Page builder</small></div><span class="sp"></span><span id="state">Loading…</span>
+<button type="button" class="btn gh" id="undo" title="Go back to what's live now">Reset to live</button><button type="button" class="btn pri" id="pub">Publish…</button></header>
+<main>
+<div id="form"></div>
+<div id="pv"><div id="pvbar"><div class="seg"><button type="button" id="vD" aria-pressed="true">Laptop</button><button type="button" id="vP" aria-pressed="false">Phone</button></div><small>Live preview · your edits show instantly</small></div>
+<div id="stage"><iframe id="frame" title="Install page preview" src="../download/?preview=1"></iframe></div></div>
+</main>
+<div id="modal" role="dialog" aria-modal="true" aria-labelledby="mT"><div class="mbox">
+  <h2 id="mT">Publish your changes</h2>
+  <div id="chk"></div>
+  <ol>
+    <li><div><p><b style="color:#fff">Copy your settings.</b></p><button type="button" class="btn pri" id="cp">Copy settings</button></div></li>
+    <li><div><p><b style="color:#fff">Open the settings file on GitHub</b> (sign in if asked).</p><a class="btn gh" href="https://github.com/Braveheart30/FPLN-/edit/main/site.json" target="_blank" rel="noopener">Open site.json on GitHub ↗</a></div></li>
+    <li><div><p>Click in the file, press <b style="color:#fff">Ctrl+A</b> then <b style="color:#fff">Ctrl+V</b>. Click <b style="color:#fff">Commit changes…</b>, then <b style="color:#fff">Commit changes</b>.</p></div></li>
+  </ol>
+  <p>GitHub checks it (plain text and colors only, no links or personal info) and puts it live in about a minute. Refresh the install page to see it.</p>
+  <div style="display:flex;gap:10px;justify-content:flex-end"><button type="button" class="btn gh" id="mX">Close</button></div>
+</div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+  var $ = function(i){ return document.getElementById(i); }, DRAFT = "fpln:builder-draft", live = null, C = null, tt = 0;
+  function toast(s){ var t = $("toast"); t.textContent = s; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(function(){ t.classList.remove("on"); }, 1800); }
+  function clone(x){ return JSON.parse(JSON.stringify(x)); }
+  function E(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  /* ---------- form schema ---------- */
+  function txt(path, label, hint, area){ return {k:"t", path:path, label:label, hint:hint, area:area}; }
+  var G = [
+    {t:"Top of the page", open:true, f:[ txt("wordmark","Brand name"), txt("chip","Badge next to the logo"), txt("kicker","Small gold line above the name"),
+      txt("tagline","Headline under the name","Put [square brackets] around the word you want in gold."), txt("subline","Blue line"), txt("lead","Short description","",true),
+      txt("button","Install button"), txt("buttonSub","Small text on the button"), {k:"list", path:"bullets", label:"Check-mark points", max:5, item:"Point"} ]},
+    {t:"Colors", f:[{k:"colors"}]},
+    {t:"Sections on the page", f:[{k:"show"}]},
+    {t:"How it works (3 steps)", f:[ txt("steps.title","Section title"), txt("steps.sub","Section intro","",true), {k:"pairs", path:"steps.items", fixed:3, a:"t", b:"d", la:"Step name", lb:"Description"} ]},
+    {t:"Features (6 tiles)", f:[ txt("features.title","Section title"), txt("features.sub","Section intro","",true), {k:"pairs", path:"features.items", fixed:6, a:"t", b:"d", la:"Feature", lb:"Description"} ]},
+    {t:"Privacy panel", f:[ txt("trust.t","Title"), txt("trust.d","Text","",true) ]},
+    {t:"Questions (FAQ)", f:[ txt("faq.title","Section title"), {k:"pairs", path:"faq.items", max:15, a:"q", b:"a", la:"Question", lb:"Answer", add:"Add a question"} ]},
+    {t:"Footer", f:[ txt("footer","Footer text","",true) ]}
+  ];
+  var SHOW = [["shots","App screenshots"],["steps","How it works"],["features","Features"],["trust","Privacy panel"],["other","Other ways to get FPLN"],["faq","Questions"]];
+  function get(path){ return path.split(".").reduce(function(o, k){ return o == null ? undefined : o[k]; }, C); }
+  function set(path, v){ var ks = path.split("."), o = C; ks.slice(0, -1).forEach(function(k){ if(o[k] == null || typeof o[k] !== "object") o[k] = {}; o = o[k]; }); o[ks[ks.length-1]] = v; }
+  function render(){
+    var h = "";
+    G.forEach(function(g, gi){ h += '<details class="grp"'+(g.open ? " open" : "")+'><summary>'+E(g.t)+'</summary><div class="fields">';
+      g.f.forEach(function(f){
+        if(f.k === "t"){ var v = get(f.path) || ""; h += '<label class="f">'+E(f.label)+(f.hint ? '<em>'+E(f.hint)+'</em>' : '')+(f.area ? '<textarea data-p="'+f.path+'" rows="3">'+E(v)+'</textarea>' : '<input type="text" data-p="'+f.path+'" value="'+E(v)+'">')+'</label>'; }
+        else if(f.k === "list"){ var L = get(f.path) || []; h += '<div class="f" style="display:flex;flex-direction:column;gap:6px"><label class="f">'+E(f.label)+'</label>';
+          L.forEach(function(x, i){ h += '<div style="display:flex;gap:6px"><input type="text" data-l="'+f.path+'" data-i="'+i+'" value="'+E(x)+'"><button type="button" class="mini" data-del="'+f.path+'" data-i="'+i+'" aria-label="Remove">✕</button></div>'; });
+          if(L.length < f.max) h += '<button type="button" class="btn gh" data-addl="'+f.path+'" style="align-self:flex-start">+ Add point</button>'; h += '</div>'; }
+        else if(f.k === "colors"){ var c = C.colors || {}; h += '<div class="colors">'+[["gold","Gold"],["gold2","Light gold"],["sky","Blue"]].map(function(x){ return '<label>'+x[1]+'<input type="color" data-c="'+x[0]+'" value="'+E(c[x[0]] || "#000000")+'"></label>'; }).join("")+'</div><button type="button" class="btn gh" id="cReset" style="align-self:flex-start">Brand colors</button>'; }
+        else if(f.k === "show"){ var s = C.show || {}; SHOW.forEach(function(x){ h += '<label class="tog"><span>'+x[1]+'</span><input type="checkbox" data-s="'+x[0]+'"'+(s[x[0]] !== false ? " checked" : "")+'></label>'; }); }
+        else if(f.k === "pairs"){ var P = get(f.path) || [];
+          P.forEach(function(it, i){ h += '<div class="pair"><div class="hd">'+E(f.la)+' '+(i+1)+'<span class="sp"></span>'+(f.fixed ? '' : '<button type="button" class="mini" data-up="'+f.path+'" data-i="'+i+'" aria-label="Move up">↑</button><button type="button" class="mini" data-pdel="'+f.path+'" data-i="'+i+'" aria-label="Remove">✕</button>')+'</div>'+
+            '<input type="text" data-pp="'+f.path+'" data-i="'+i+'" data-f="'+f.a+'" value="'+E(it[f.a])+'" aria-label="'+E(f.la)+'"><textarea rows="2" data-pp="'+f.path+'" data-i="'+i+'" data-f="'+f.b+'" aria-label="'+E(f.lb)+'">'+E(it[f.b])+'</textarea></div>'; });
+          if(!f.fixed && P.length < f.max) h += '<button type="button" class="btn gh" data-padd="'+f.path+'" data-a="'+f.a+'" data-b="'+f.b+'" style="align-self:flex-start">+ '+E(f.add)+'</button>'; }
+      });
+      h += '</div></details>'; });
+    var open = [].map.call(document.querySelectorAll("details.grp"), function(d){ return d.open; });
+    $("form").innerHTML = h;
+    if(open.length) [].forEach.call(document.querySelectorAll("details.grp"), function(d, i){ d.open = open[i]; });
+  }
+  /* ---------- preview + draft ---------- */
+  var pt = 0;
+  function changed(){ try{ localStorage.setItem(DRAFT, JSON.stringify(C)); }catch(e){} var dirty = JSON.stringify(C) !== JSON.stringify(live);
+    $("state").textContent = dirty ? "Unpublished changes (saved on this computer)" : "Matches what's live"; $("state").className = dirty ? "dirty" : "";
+    clearTimeout(pt); pt = setTimeout(preview, 120); }
+  function preview(){ try{ var w = $("frame").contentWindow; if(w && w.FPLN_SITE_APPLY) w.FPLN_SITE_APPLY(clone(C)); }catch(e){} }
+  $("frame").addEventListener("load", function(){ setTimeout(preview, 50); });
+  $("form").addEventListener("input", function(e){ var t = e.target, d = t.dataset;
+    if(d.p) set(d.p, t.value);
+    else if(d.l){ get(d.l)[+d.i] = t.value; }
+    else if(d.pp){ get(d.pp)[+d.i][d.f] = t.value; }
+    else if(d.c){ C.colors = C.colors || {}; C.colors[d.c] = t.value; }
+    else if(d.s){ C.show = C.show || {}; C.show[d.s] = t.checked; }
+    changed(); });
+  $("form").addEventListener("change", function(e){ if(e.target.dataset.s){ C.show[e.target.dataset.s] = e.target.checked; changed(); } });
+  $("form").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; var d = b.dataset;
+    if(d.addl){ var L = get(d.addl) || []; L.push("New point"); set(d.addl, L); }
+    else if(d.del){ get(d.del).splice(+d.i, 1); }
+    else if(d.padd){ var P = get(d.padd) || []; var o = {}; o[d.a] = "New question?"; o[d.b] = "Answer."; P.push(o); set(d.padd, P); }
+    else if(d.pdel){ get(d.pdel).splice(+d.i, 1); }
+    else if(d.up){ var A = get(d.up), i = +d.i; if(i > 0){ var x = A[i]; A[i] = A[i-1]; A[i-1] = x; } }
+    else if(b.id === "cReset"){ C.colors = {gold:"#e2bd74", gold2:"#f6dca2", sky:"#8fd6ff"}; }
+    else return;
+    render(); changed(); });
+  $("vD").onclick = function(){ $("stage").classList.remove("phone"); this.setAttribute("aria-pressed","true"); $("vP").setAttribute("aria-pressed","false"); };
+  $("vP").onclick = function(){ $("stage").classList.add("phone"); this.setAttribute("aria-pressed","true"); $("vD").setAttribute("aria-pressed","false"); };
+  $("undo").onclick = function(){ if(!live) return; C = clone(live); try{ localStorage.removeItem(DRAFT); }catch(e){} render(); changed(); toast("Back to what's live"); };
+  /* ---------- publish ---------- */
+  function check(){ var bad = [], s = JSON.stringify(C);
+    (function walk(x, p){ if(typeof x === "string"){ if(/https?:\/\/|www\./i.test(x)) bad.push(p+": no web addresses in page text"); if(/<\s*\/?\s*[a-z]|javascript:/i.test(x)) bad.push(p+": no code or < > tags"); if(/[\w.+-]+@[\w-]+\.[\w.]+/.test(x)) bad.push(p+": no email addresses"); if(x.length > 800) bad.push(p+": shorter than 800 characters"); }
+      else if(x && typeof x === "object") Object.keys(x).forEach(function(k){ walk(x[k], p ? p+"."+k : k); }); })(C, "");
+    if(s.length > 40000) bad.push("Too much text overall");
+    var el = $("chk"); if(bad.length){ el.className = "bad"; el.innerHTML = "<b>Fix these first:</b><br>"+bad.slice(0,6).map(E).join("<br>"); } else { el.className = "ok"; el.textContent = "✓ Passes the safety check: plain text and colors only."; }
+    return !bad.length; }
+  $("pub").onclick = function(){ check(); $("modal").classList.add("on"); $("cp").focus(); };
+  $("mX").onclick = function(){ $("modal").classList.remove("on"); };
+  $("modal").addEventListener("click", function(e){ if(e.target.id === "modal") $("modal").classList.remove("on"); });
+  addEventListener("keydown", function(e){ if(e.key === "Escape") $("modal").classList.remove("on"); });
+  $("cp").onclick = function(){ if(!check()) return toast("Fix the items in red first"); var s = JSON.stringify(C, null, 2) + "\n";
+    function fb(){ var ta = document.createElement("textarea"); ta.value = s; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); toast("Settings copied"); }catch(e){ toast("Couldn't copy"); } ta.remove(); }
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(s).then(function(){ toast("Settings copied"); }, fb); else fb(); };
+  /* ---------- load ---------- */
+  fetch("../site.json?b=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.json(); }).then(function(j){ live = j; var d = null;
+    try{ d = JSON.parse(localStorage.getItem(DRAFT) || "null"); }catch(e){}
+    C = d && typeof d === "object" ? d : clone(live); render(); changed(); if(d && JSON.stringify(d) !== JSON.stringify(live)) toast("Your unpublished draft is back"); })
+  .catch(function(){ $("state").textContent = "Couldn't load the current settings. Refresh to try again."; });
+})();
+</script>
+</body></html>

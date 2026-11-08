@@ -143,7 +143,7 @@ self.addEventListener('fetch', e => {
   }
   if (req.method !== 'GET') return;
   if (AUTO_LV >= 1 && url.pathname.includes('/vendor/')) { e.respondWith(Response.error()); return; }   // auto-secure: file readers paused
-  if (url.pathname.endsWith('version.json') || url.pathname.endsWith('control.json')) return;
+  if (url.pathname.endsWith('version.json') || url.pathname.endsWith('control.json') || url.pathname.endsWith('site.json')) return;
   if (req.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('index.html')) {
     // FPLN's own app page gets the app's browser policy; other pages on the site (Test Range, download) keep their own
     const root = new URL('./', self.registration.scope).pathname, app = url.pathname === root || url.pathname === root + 'index.html';
