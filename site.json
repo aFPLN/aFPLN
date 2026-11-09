@@ -107,5 +107,14 @@
       }
     ]
   },
-  "footer": "FPLN · Flight Plan, beta 1. A cadet project, not an official USMA or U.S. Army product. Map data © OpenStreetMap contributors."
+  "footer": "FPLN · Flight Plan, beta 1. A cadet project, not an official USMA or U.S. Army product. Map data © OpenStreetMap contributors.",
+  "layout": {
+    "align": "left",
+    "wordmark": "m",
+    "phoneShots": true,
+    "phoneOrder": "text",
+    "phoneWordmark": "m",
+    "phoneCompact": false,
+    "phoneAlign": "left"
+  }
 }

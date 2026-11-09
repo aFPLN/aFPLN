@@ -84,6 +84,16 @@ details p{margin:0 0 16px;color:#c3d1de;max-width:52em}
 footer{padding:40px 0 60px;color:var(--faint);font-size:13.5px;border-top:1px solid var(--line)}
 @media (max-width:900px){.hero{grid-template-columns:1fr;gap:40px;padding-top:24px}.steps,.feat,.ways{grid-template-columns:1fr}.shots{max-width:620px}}
 @media (max-width:560px){.wrap{padding:0 16px}nav a.l.hide{display:none}nav a.l{font-size:11.5px;padding:8px 6px}.go{width:100%;justify-content:center}.trust{grid-template-columns:1fr}section{padding:50px 0}.ph{width:30%;right:-4px}}
+/* layout settings from site.json (Command Center): data-* on <html> */
+html[data-align="center"] .hero > div:first-child{text-align:center}html[data-align="center"] .cta{align-items:center}html[data-align="center"] .meta{justify-content:center}html[data-align="center"] .lead{margin-left:auto;margin-right:auto}
+html[data-wm="s"] .wm{font-size:clamp(64px,9vw,112px)}html[data-wm="l"] .wm{font-size:clamp(96px,16vw,210px)}
+@media (max-width:560px){
+  html[data-pshots="off"] .shots{display:none}
+  html[data-porder="shots"] .hero > div:first-child{order:2}html[data-porder="shots"] .shots{order:1}
+  html[data-pwm="s"] .wm{font-size:64px}html[data-pwm="m"] .wm{font-size:84px}html[data-pwm="l"] .wm{font-size:clamp(96px,30vw,128px)}
+  html[data-pcompact="on"] section{padding:34px 0}html[data-pcompact="on"] .hero{padding:12px 0 36px;gap:26px}html[data-pcompact="on"] .lead{font-size:16px;margin-bottom:20px}html[data-pcompact="on"] .step,html[data-pcompact="on"] .f,html[data-pcompact="on"] .way{padding:16px}
+  html[data-palign="center"] .hero > div:first-child{text-align:center}html[data-palign="center"] .cta{align-items:center}html[data-palign="center"] .meta{justify-content:center}
+}
 @media (prefers-reduced-motion:reduce){.sky .grid{animation:none}html{scroll-behavior:auto}}
 </style></head><body>
 <div class="sky" aria-hidden="true"><div class="ridge"></div><div class="ground"></div><div class="grid"></div></div>
@@ -223,6 +233,10 @@ footer{padding:40px 0 60px;color:var(--faint);font-size:13.5px;border-top:1px so
         var w = fq.querySelector(".wrap"); c.faq.items.slice(0, 15).forEach(function(it){ if(!it || !str(it.q)) return; var d = document.createElement("details"), s = document.createElement("summary"), p = document.createElement("p");
           s.textContent = str(it.q, 200); p.textContent = str(it.a, 800) || ""; d.appendChild(s); d.appendChild(p); w.appendChild(d); }); } }
     T($("sFoot"), c.footer);
+    var L = c.layout || {}, H = document.documentElement, A = {align:["left","center"], wordmark:["s","m","l"], phoneShots:[true,false], phoneOrder:["text","shots"], phoneWordmark:["s","m","l"], phoneCompact:[false,true], phoneAlign:["left","center"]};
+    function at(n, k, v){ if(A[k].indexOf(v) >= 0) H.setAttribute(n, String(v === true ? "on" : v === false ? "off" : v)); else H.removeAttribute(n); }
+    at("data-align","align",L.align); at("data-wm","wordmark",L.wordmark); at("data-pshots","phoneShots",L.phoneShots); at("data-porder","phoneOrder",L.phoneOrder);
+    at("data-pwm","phoneWordmark",L.phoneWordmark); at("data-pcompact","phoneCompact",L.phoneCompact); at("data-palign","phoneAlign",L.phoneAlign);
   }
   window.FPLN_SITE_APPLY = apply;
   if(!/[?&]preview=1/.test(location.search)) fetch("../site.json", {cache:"no-store"}).then(function(r){ return r.ok ? r.json() : null; }).then(apply).catch(function(){});

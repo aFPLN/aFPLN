@@ -8,7 +8,7 @@ MARKS = re.compile(r"\b(" + "|".join(["FRAG" + "ORD", "OP" + "ORD\\s+\\d", "C" +
 if len(raw) > 40000: bad.append("file is larger than 40 KB")
 try: c = json.loads(raw)
 except Exception as e: print("FAIL: site.json is not valid JSON:", e); sys.exit(1)
-TOP = {"v","chip","wordmark","kicker","tagline","subline","lead","button","buttonSub","bullets","colors","show","steps","features","trust","faq","footer"}
+TOP = {"v","chip","wordmark","kicker","tagline","subline","lead","button","buttonSub","bullets","colors","show","steps","features","trust","faq","footer","layout"}
 for k in c:
     if k not in TOP: bad.append("unknown setting: %s" % k)
 def walk(x, path):
@@ -28,6 +28,9 @@ def walk(x, path):
 walk(c, "site")
 for k, v in (c.get("colors") or {}).items():
     if not (isinstance(v, str) and re.fullmatch(r"#[0-9a-fA-F]{6}", v)): bad.append("colors.%s must look like #e2bd74" % k)
+LAY = {"align":["left","center"], "wordmark":["s","m","l"], "phoneShots":[True,False], "phoneOrder":["text","shots"], "phoneWordmark":["s","m","l"], "phoneCompact":[True,False], "phoneAlign":["left","center"]}
+for k, v in (c.get("layout") or {}).items():
+    if k not in LAY or v not in LAY[k]: bad.append("layout.%s has an unsupported value" % k)
 if bad:
     print("FAIL: site.json was not published:"); [print(" -", b) for b in bad]; sys.exit(1)
 print("PASS: site.json is plain text and colors only.")
