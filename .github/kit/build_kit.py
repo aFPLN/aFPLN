@@ -32,8 +32,8 @@ Everything for FPLN in one place.
    message.txt ................. ready-made text to send people
 
 3 Links\\
-   FPLN app, Install page, Share page, Page builder, Download machine,
-   and "Edit site settings (GitHub)" for publishing page-builder changes
+   FPLN app, Install page, Share page, Download machine
+   (edit the install page from your private FPLN Command Center)
 
 4 Screenshots\\
    FPLN on a laptop and on a phone
@@ -48,9 +48,8 @@ for src, dst in [("share/banner.png","banner.png"),("share/badge.png","badge.png
     files.append(("2 Share/" + dst, open(src, "rb").read()))
 files.append(("2 Share/email-banners.html", email.encode()))
 files.append(("2 Share/message.txt", msg.replace("\n", "\r\n").encode("utf-8-sig")))
-for name, u in [("FPLN app", ""), ("Install page", "get"), ("Share page", "share/"), ("Page builder", "builder/"), ("Download machine", "kit/")]:
+for name, u in [("FPLN app", ""), ("Install page", "get"), ("Share page", "share/"), ("Download machine", "kit/")]:
     files.append(("3 Links/%s.url" % name, url(name, BASE + u)))
-files.append(("3 Links/Edit site settings (GitHub).url", url("gh", "https://github.com/Braveheart30/FPLN-/edit/main/site.json")))
 for src, dst in [("download/shot-desktop.png", "FPLN on a laptop.png"), ("download/shot-phone.png", "FPLN on a phone.png")]:
     files.append(("4 Screenshots/" + dst, open(src, "rb").read()))
 files.insert(0, ("README.txt", readme.replace("\n", "\r\n").encode()))

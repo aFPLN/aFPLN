@@ -1,5 +1,5 @@
 {
- "bytes": 1265374,
+ "bytes": 1264858,
  "files": [
   "README.txt",
   "1 Install FPLN/Install FPLN.cmd",
@@ -18,9 +18,7 @@
   "3 Links/FPLN app.url",
   "3 Links/Install page.url",
   "3 Links/Share page.url",
-  "3 Links/Page builder.url",
   "3 Links/Download machine.url",
-  "3 Links/Edit site settings (GitHub).url",
   "4 Screenshots/FPLN on a laptop.png",
   "4 Screenshots/FPLN on a phone.png"
  ]

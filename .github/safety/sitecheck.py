@@ -1,4 +1,4 @@
-"""Checks site.json (written by the FPLN page builder) before it goes live.
+"""Checks site.json (written by the FPLN Command Center launch-site editor) before it goes live.
 Only plain text and colors are allowed: no links, no code, no personal data patterns."""
 import json, re, sys
 p = sys.argv[1] if len(sys.argv) > 1 else "site.json"
