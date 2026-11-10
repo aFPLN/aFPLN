@@ -1,24 +1,18 @@
 {
   "v": 1,
-  "rev": "banner-20261109-011159",
+  "rev": "clear-banner-20261110-015927",
   "kill": {
     "state": "none",
     "id": "R-20261102-043736",
     "msg": ""
   },
-  "off": [
-    "libs"
-  ],
-  "banner": {
-    "id": "B-20261109-011159",
-    "text": "File readers is off for a safety check. Your planner is safe on this device.",
-    "level": "info"
-  },
-  "updated": "2026-11-09T01:11:59+00:00",
+  "off": [],
+  "banner": null,
+  "updated": "2026-11-10T01:59:27+00:00",
   "by": "autosecure",
   "autosecure": {
     "device": true
   },
-  "at_off": 1794186719734,
-  "at_banner": 1794186719766
+  "at_off": 1794275967731,
+  "at_banner": 1794275967764
 }

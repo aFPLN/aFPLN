@@ -2,19 +2,8 @@
   "v": 1,
   "enabled": true,
   "device": true,
-  "applied": {
-    "libs": {
-      "at": 1794186719734,
-      "sig": [
-        "CVE-2026-97151"
-      ]
-    }
-  },
-  "banner": {
-    "text": "File readers is off for a safety check. Your planner is safe on this device.",
-    "at": 1794186719734,
-    "kind": "contain"
-  },
+  "applied": {},
+  "banner": null,
   "overridden": {},
   "history": [
     {
@@ -136,15 +125,19 @@
     {
       "at": "2026-11-09T01:11:59+00:00",
       "what": "safety-check banner: File readers"
+    },
+    {
+      "at": "2026-11-10T01:59:27+00:00",
+      "what": "tests for File readers pass again; turned it back on"
+    },
+    {
+      "at": "2026-11-10T01:59:27+00:00",
+      "what": "every feature is back on; safety-check banner removed"
     }
   ],
-  "checked": "2026-11-09T01:11:59+00:00",
+  "checked": "2026-11-10T01:59:27+00:00",
   "last": {
-    "failures": {
-      "libs": [
-        "CVE-2026-97151"
-      ]
-    },
+    "failures": {},
     "advisory": [],
     "unmapped": [
       "P1",
