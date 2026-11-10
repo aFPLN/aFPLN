@@ -32,7 +32,7 @@ jobs:
           python-version: "3.12"
       - name: Install browser
         run: |
-          pip install playwright==1.48.0
+          pip install playwright==1.63.0
           python -m playwright install --with-deps chromium
       - name: Threat watch
         run: python .github/safety/threatwatch.py --root . --out threatwatch.json || true
