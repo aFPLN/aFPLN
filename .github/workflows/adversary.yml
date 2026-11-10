@@ -23,7 +23,7 @@ jobs:
           python-version: "3.12"
       - name: Install browser
         run: |
-          pip install playwright==1.48.0
+          pip install playwright==1.63.0
           python -m playwright install --with-deps chromium
       - name: Run the adversary tier
         run: python .github/safety/adversary.py --root . --out adversary.json
