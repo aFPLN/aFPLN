@@ -1,0 +1,25 @@
+{
+ "bytes": 1407459,
+ "files": [
+  "README.txt",
+  "1 Install FPLN/Install FPLN.cmd",
+  "1 Install FPLN/FPLN keep awake.cmd",
+  "1 Install FPLN/FPLN undo keep awake.cmd",
+  "1 Install FPLN/FPLN (web link).url",
+  "1 Install FPLN/README.txt",
+  "1 Install FPLN/FPLN.ico",
+  "2 Share/banner.png",
+  "2 Share/badge.png",
+  "2 Share/badge-gold.png",
+  "2 Share/qr-code.png",
+  "2 Share/link-preview.png",
+  "2 Share/email-banners.html",
+  "2 Share/message.txt",
+  "3 Links/FPLN app.url",
+  "3 Links/Install page.url",
+  "3 Links/Share page.url",
+  "3 Links/Download machine.url",
+  "4 Screenshots/FPLN on a laptop.png",
+  "4 Screenshots/FPLN on a phone.png"
+ ]
+}
