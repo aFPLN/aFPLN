@@ -17,7 +17,7 @@ ap = argparse.ArgumentParser(); ap.add_argument("--new", required=True); ap.add_
 ap.add_argument("--layout", choices=["user", "project"], default="user", help="project = the old FPLN- repo's own gh-pages branch serves /FPLN-/")
 A = ap.parse_args()
 NEW = A.new if A.new.endswith("/") else A.new + "/"
-if not re.fullmatch(r"https://[a-z0-9-]+\.github\.io/FPLN-/|https://[a-z0-9.-]+\.[a-z]{2,}/(FPLN-/)?", NEW): sys.exit("--new must look like https://org.github.io/FPLN-/")
+if not re.fullmatch(r"https://[a-z0-9-]+\.github\.io/[A-Za-z0-9._-]+/|https://[a-z0-9.-]+\.[a-z]{2,}/([A-Za-z0-9._-]+/)?", NEW): sys.exit("--new must look like https://org.github.io/FPLN/")
 if NEW.startswith("https://braveheart30.github.io"): sys.exit("--new must be a different address")
 R = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))); H = os.path.join(R, ".github", "move", "handoff")
 O = os.path.abspath(A.out); F = os.path.join(O, "FPLN-") if A.layout == "user" else O

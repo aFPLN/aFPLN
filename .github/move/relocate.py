@@ -1,24 +1,28 @@
 #!/usr/bin/env python3
 """Point FPLN at its new home: rewrites the site address and the repository owner everywhere in the repo.
 
-Usage: python3 .github/move/relocate.py --org ORG [--dry-run]
+Usage: python3 .github/move/relocate.py --org ORG [--repo NAME] [--dry-run]
   braveheart30.github.io  -> ORG.github.io        (links, share images, CSP, guard and worker allowlists, tests)
   Braveheart30/FPLN-      -> ORG/FPLN-            (GitHub links in the Command Center help and the Site Builder)
 Left alone on purpose: move/index.html (it must keep accepting plans from the old address), .github/move/
 and the git history. Afterwards run .github/site/build.py so the install page picks up the change.
 """
 import argparse, os, re, sys
-ap = argparse.ArgumentParser(); ap.add_argument("--org", required=True); ap.add_argument("--dry-run", action="store_true"); A = ap.parse_args()
-org = A.org
+ap = argparse.ArgumentParser(); ap.add_argument("--org", required=True); ap.add_argument("--repo", default="FPLN-", help="the new repository's name (it is also the site path)")
+ap.add_argument("--dry-run", action="store_true"); A = ap.parse_args()
+org = A.org; repo = A.repo
+if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,99}", repo): sys.exit("bad --repo")
 if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]{0,38}", org) or org.lower() == "braveheart30": sys.exit("bad --org")
 low = org.lower()
 R = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SKIP_DIRS = {".git", "vendor", "node_modules"}
 SKIP = {os.path.join("move", "index.html")}
-SUBS = [("braveheart30.github.io", low + ".github.io"),
+SUBS = [("braveheart30.github.io/FPLN-/", low + ".github.io/" + repo + "/"),
+        ("Braveheart30/FPLN-", org + "/" + repo), ("Braveheart30/fpln-", org + "/" + repo.lower()),
+        ("/FPLN-/", "/" + repo + "/"), ("\\/FPLN-\\/", "\\/" + repo + "\\/"), ("\\\\/FPLN-\\\\/", "\\\\/" + repo + "\\\\/"), ('os.path.join(TMP, "FPLN-")', 'os.path.join(TMP, "' + repo + '")'),
+        ("braveheart30.github.io", low + ".github.io"),
         ("braveheart30\\.github\\.io", low + "\\.github\\.io"),
         ("braveheart30\\\\.github\\\\.io", low + "\\\\.github\\\\.io"),
-        ("Braveheart30/FPLN-", org + "/FPLN-"), ("Braveheart30/fpln-", org + "/fpln-"),
         ("owner Braveheart30", "owner " + org)]
 changed = []
 for d, ds, fs in os.walk(R):
