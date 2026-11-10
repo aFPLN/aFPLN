@@ -135,13 +135,10 @@
       "what": "every feature is back on; safety-check banner removed"
     }
   ],
-  "checked": "2026-11-10T01:59:27+00:00",
+  "checked": "2026-11-10T03:01:57+00:00",
   "last": {
     "failures": {},
     "advisory": [],
-    "unmapped": [
-      "P1",
-      "P2"
-    ]
+    "unmapped": []
   }
 }
