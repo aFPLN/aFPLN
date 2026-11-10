@@ -80,7 +80,7 @@ with sync_playwright() as p:
     page.reload(); time.sleep(3)
     check(G, "Service worker in control", page.evaluate("!!navigator.serviceWorker.controller"))
     rd = page.evaluate("""() => new Promise(res => { const fr = document.getElementById('fClock').contentWindow, doc = fr.document; let n = 0, out = {};
-      ['vendor/xlsx-0.20.3.full.min.js', 'vendor/mammoth-1.11.0.browser.min.js'].forEach(src => { const s = doc.createElement('script'); s.src = src;
+      ['vendor/xlsx-0.20.3.full.min.js', 'vendor/mammoth-1.12.2.browser.min.js'].forEach(src => { const s = doc.createElement('script'); s.src = src;
         s.onload = s.onerror = () => { if (++n === 2) res({xlsx: fr.XLSX && fr.XLSX.version, mammoth: !!(fr.mammoth && fr.mammoth.extractRawText)}); }; doc.head.appendChild(s); }); setTimeout(() => res(out), 8000); })""")
     check(G, "Patched file readers load from FPLN's own site", rd.get("xlsx") == "0.20.3" and rd.get("mammoth"), rd)
     xs = page.evaluate("""() => { const X = document.getElementById('fClock').contentWindow.XLSX; const wb = X.utils.book_new(); X.utils.book_append_sheet(wb, X.utils.aoa_to_sheet([['Task','Due'],['WPR 2','2026-11-10']]), 'S');
