@@ -51,8 +51,8 @@ footer{margin-top:50px;color:var(--faint);font-size:13.5px}
 <div class="machine">
   <p class="kick">FPLN · Download machine</p>
   <h1><span>Everything.</span> One click.</h1>
-  <p class="lead">The installer, the overnight-alarm helper, every banner, badge and QR code, the email banners, the share message, screenshots and shortcuts to every FPLN page. One zip, always the latest.</p>
-  <a class="go" id="go" href="FPLN-kit.zip" download="FPLN-kit.zip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Download everything</b><small id="sz">FPLN-kit.zip · 1.3 MB</small></span></a>
+  <p class="lead">The installer, the overnight-alarm helper, every banner, badge and QR code, the email banner, the share message, screenshots and shortcuts to every FPLN page. One zip, always the latest.</p>
+  <a class="go" id="go" href="FPLN-kit.zip" download="FPLN-kit.zip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Download everything</b><small id="sz">FPLN-kit.zip · 2.1 MB</small></span></a>
   <ul class="belt" id="belt"><li>Installer</li><li>Alarm helper</li><li>Banners &amp; badges</li><li>QR code</li><li>Email banners</li><li>Share message</li><li>Shortcuts</li><li>Screenshots</li></ul>
   <div id="done" role="status" aria-live="polite"><b>Downloaded.</b> Open it from your Downloads folder, click <b>Extract all</b>, then start with <b>README.txt</b>. To install FPLN, open <b>1 Install FPLN</b> › <b>Install FPLN</b>.</div>
 </div>
@@ -65,15 +65,17 @@ footer{margin-top:50px;color:var(--faint);font-size:13.5px}
   </ul></div>
   <div class="card"><h3>Share</h3><ul>
     <li><a href="../share/banner.png" download="FPLN-banner.png">Banner <small>.png</small></a></li>
+    <li><a href="../share/banner-email.png" download="FPLN-email-banner.png">Email banner picture <small>.png</small></a></li>
     <li><a href="../share/badge.png" download="FPLN-badge.png">Badge, navy <small>.png</small></a></li>
     <li><a href="../share/badge-gold.png" download="FPLN-badge-gold.png">Badge, gold <small>.png</small></a></li>
     <li><a href="../share/qr.png" download="FPLN-QR.png">QR code <small>.png</small></a></li>
     <li><a href="../share/og.png" download="FPLN-link-preview.png">Link preview card <small>.png</small></a></li>
-    <li><a class="ext" href="../share/#email">Email banners (copy &amp; paste) <small>page</small></a></li>
+    <li><a class="ext" href="../share/#email">Email banner (copy &amp; paste) <small>page</small></a></li>
   </ul></div>
   <div class="card"><h3>Screenshots</h3><ul>
     <li><a href="../download/shot-desktop.png" download="FPLN-laptop.png">FPLN on a laptop <small>.png</small></a></li>
     <li><a href="../download/shot-phone.png" download="FPLN-phone.png">FPLN on a phone <small>.png</small></a></li>
+    <li><a href="../download/shot-brief.png" download="FPLN-flight-plan.png">The Flight plan <small>.png</small></a></li>
   </ul></div>
   <div class="card"><h3>Pages</h3><ul>
     <li><a class="ext" href="../share/">Share kit <small>page</small></a></li>
@@ -85,7 +87,7 @@ footer{margin-top:50px;color:var(--faint);font-size:13.5px}
 <script>
 (function(){
   var go = document.getElementById("go"), items = [].slice.call(document.querySelectorAll("#belt li")), busy = false;
-  fetch("kit.json", {cache:"no-store"}).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ if(j && j.bytes) document.getElementById("sz").textContent = "FPLN-kit.zip · " + (j.bytes / 1048576).toFixed(1) + " MB"; }).catch(function(){});
+  fetch("kit.json", {cache:"no-store"}).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ if(j && j.bytes) document.getElementById("sz").textContent = "FPLN-kit.zip · " + (j.bytes / 1048576).toFixed(1) + " MB" + (j.version ? " · v" + j.version.split(" ")[0] : ""); }).catch(function(){});
   go.addEventListener("click", function(){
     if(busy) return; busy = true; var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     items.forEach(function(li){ li.className = ""; });

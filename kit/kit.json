@@ -1,5 +1,6 @@
 {
- "bytes": 1511775,
+ "bytes": 2152917,
+ "version": "0.8.4 beta 1 \u00b7 11 Nov 2026",
  "files": [
   "README.txt",
   "1 Install FPLN/Install FPLN.cmd",
@@ -9,17 +10,19 @@
   "1 Install FPLN/README.txt",
   "1 Install FPLN/FPLN.ico",
   "2 Share/banner.png",
+  "2 Share/email-banner.png",
   "2 Share/badge.png",
   "2 Share/badge-gold.png",
   "2 Share/qr-code.png",
   "2 Share/link-preview.png",
-  "2 Share/email-banners.html",
+  "2 Share/Email banner.html",
   "2 Share/message.txt",
   "3 Links/FPLN app.url",
   "3 Links/Install page.url",
   "3 Links/Share page.url",
   "3 Links/Download machine.url",
   "4 Screenshots/FPLN on a laptop.png",
-  "4 Screenshots/FPLN on a phone.png"
+  "4 Screenshots/FPLN on a phone.png",
+  "4 Screenshots/FPLN flight plan.png"
  ]
 }

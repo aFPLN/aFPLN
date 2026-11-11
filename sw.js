@@ -3,7 +3,7 @@
    every request to another site at the network layer, even if the page's own code fails.
    It also enforces the service pins (AI only with the cadet's own key, Canvas only the cadet's school, read-only,
    everything else download-only) and follows the page's auto-secure level, independently of the page's own code. */
-const CACHE = 'fpln-202611070000';
+const CACHE = 'fpln-202611112000';
 const CTL = 'fpln-ctl';
 const CORE = ['./', './index.html', './manifest.webmanifest', './favicon.ico', './icons/icon-32.png', './icons/icon-64.png', './icons/icon-192.png', './icons/icon-512.png'];
 const FEAT = {
@@ -143,11 +143,13 @@ self.addEventListener('fetch', e => {
   }
   if (req.method !== 'GET') return;
   if (AUTO_LV >= 1 && url.pathname.includes('/vendor/')) { e.respondWith(Response.error()); return; }   // auto-secure: file readers paused
-  if (url.pathname.endsWith('version.json') || url.pathname.endsWith('control.json') || url.pathname.endsWith('site.json')) return;
+  if (/(version|control|site|kit)\.json$/.test(url.pathname)) return;
   if (req.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('index.html')) {
     // FPLN's own app page gets the app's browser policy; other pages on the site (Test Range, download) keep their own
     const root = new URL('./', self.registration.scope).pathname, app = url.pathname === root || url.pathname === root + 'index.html';
     e.waitUntil(ready.then(() => refresh(false))); e.respondWith(ready.then(() => fresh(req)).then(r => app ? harden(r) : r)); return; }
+  // downloads and share files (the kit, banners, QR, screenshots) are always the newest copy; only the app's own libraries and icons are cache-first
+  if (!/\/(vendor|icons)\//.test(url.pathname)) { e.respondWith(fresh(req)); return; }
   e.respondWith(caches.match(req).then(r => r || fetch(req).then(res => { if (res.ok && !(SAFE && SAFE.state === 'erase')) { const c = res.clone(); caches.open(CACHE).then(x => x.put(req, c)); } return res; })));
 });
 self.addEventListener('message', e => {
