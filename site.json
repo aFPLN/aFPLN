@@ -1,120 +1,120 @@
 {
-  "v": 1,
-  "chip": "BETA 1",
-  "wordmark": "FPLN",
-  "kicker": "The first productivity app built by cadets, for cadets",
-  "tagline": "Own the [day.]",
-  "subline": "Alarm. Planner. Assistant.",
-  "lead": "Minute calls, an alarm that actually gets you up, every assignment in one list. Built for tomorrow.",
-  "button": "Install FPLN",
-  "buttonSub": "Free · one click",
-  "bullets": [
-    "Updates itself",
-    "Works offline",
-    "Your data stays on your device"
-  ],
-  "colors": {
-    "gold": "#e2bd74",
-    "gold2": "#f6dca2",
-    "sky": "#8fd6ff"
-  },
-  "show": {
-    "shots": true,
-    "steps": true,
-    "features": true,
-    "trust": true,
-    "other": true,
-    "faq": true
-  },
-  "steps": {
-    "title": "From install to first formation",
-    "sub": "No accounts, no sign-up. FPLN walks you through everything the first time it opens.",
-    "items": [
-      {
-        "t": "Install",
-        "d": "One click above. FPLN gets its own window, a taskbar and Start-menu icon, and it works offline."
-      },
-      {
-        "t": "Pre-flight setup",
-        "d": "Pick your class and company, switch on minute calls and your alarm, test the sound and choose a theme."
-      },
-      {
-        "t": "Fly",
-        "d": "Load your BUFF card or syllabi so FPLN fills in your week. Updates arrive by themselves; you never download it again."
-      }
-    ]
-  },
-  "features": {
-    "title": "Everything a cadet runs on",
-    "sub": "The first productivity app built by cadets, for cadets. Built for tomorrow.",
-    "items": [
-      {
-        "t": "Minute calls",
-        "d": "10, 5, 4, 3, 2 before each formation, with your own times and days."
-      },
-      {
-        "t": "Wake-up alarm",
-        "d": "Rings with sound and a notification, even with the screen off, plus a phone backup."
-      },
-      {
-        "t": "Tasks & Canvas",
-        "d": "Assignments and deadlines in one list. Import your Canvas list in seconds."
-      },
-      {
-        "t": "Uniform & OPORDs",
-        "d": "Uniform of the day with the gear board, and a weekly order you can plan and send."
-      },
-      {
-        "t": "Post map with hours",
-        "d": "Grant Hall, the library, Arvin and the rest, with what's open right now."
-      },
-      {
-        "t": "Days ahead",
-        "d": "The academic calendar, Army football, holidays and a quote to start each day."
-      }
-    ]
-  },
-  "trust": {
-    "t": "Your data stays on your device",
-    "d": "Nothing you enter is uploaded; there's no account and no server holding your plan. Automatic safety checks run on every update. Keep CUI out of FPLN: no FRAGORDs, rosters or other cadets' personal information."
-  },
-  "faq": {
-    "title": "Questions",
-    "items": [
-      {
-        "q": "Do I ever need to download it again?",
-        "a": "No. FPLN checks for a newer version every time it opens and while it runs. When one is ready you'll see “Update ready · Restart now.”"
-      },
-      {
-        "q": "Will the alarm work with the screen off?",
-        "a": "Yes, while FPLN is open. On a laptop, keep it plugged in. The Windows download includes “FPLN keep awake”, which stops Windows from sleeping while plugged in (and an undo file). For extra safety, Wake up › Back up alarms to my phone."
-      },
-      {
-        "q": "Where is my data, and who can see it?",
-        "a": "Only on the device you use, inside the browser that runs FPLN. Nothing goes to a server, and no one else can see it. More › Backup moves it to a new computer."
-      },
-      {
-        "q": "The Install button didn't do anything.",
-        "a": "FPLN may already be installed: look for it in your Start menu or taskbar. Otherwise, in Edge or Chrome open the ⋯ menu › Apps › Install this site as an app. Firefox can't install apps; use Edge or Chrome, or just use FPLN in the browser."
-      },
-      {
-        "q": "How do I uninstall it?",
-        "a": "Open FPLN, click ⋯ at the top right › Uninstall. On a phone, press and hold the icon › Remove."
-      },
-      {
-        "q": "Is this an official USMA app?",
-        "a": "No. FPLN is a cadet project in beta, not an official USMA or U.S. Army product. Send feedback with the speech-bubble button in the app."
-      }
-    ]
-  },
-  "footer": "FPLN · Flight Plan, beta 1. A cadet project, not an official USMA or U.S. Army product. Map data © OpenStreetMap contributors.",
-  "layout": {
-    "align": "left",
-    "wordmark": "m",
-    "phoneShots": true,
-    "phoneOrder": "text",
-    "phoneWordmark": "m",
-    "phoneCompact": false,
-    "phoneAlign": "left"
-  }
+ "v": 1,
+ "chip": "BETA 1",
+ "wordmark": "FPLN",
+ "kicker": "The first productivity app built by cadets, for cadets",
+ "tagline": "Own the [day.]",
+ "subline": "Alarm. Planner. Assistant.",
+ "lead": "Minute calls, an alarm that gets you up and briefs your day, every assignment in one list. Built for tomorrow.",
+ "button": "Install FPLN",
+ "buttonSub": "Free · one click",
+ "bullets": [
+  "Updates itself",
+  "Works offline",
+  "Your data stays on your device"
+ ],
+ "colors": {
+  "gold": "#e2bd74",
+  "gold2": "#f6dca2",
+  "sky": "#8fd6ff"
+ },
+ "show": {
+  "shots": true,
+  "steps": true,
+  "features": true,
+  "trust": true,
+  "other": true,
+  "faq": true
+ },
+ "steps": {
+  "title": "From install to first formation",
+  "sub": "No accounts, no sign-up. FPLN walks you through everything the first time it opens.",
+  "items": [
+   {
+    "t": "Install",
+    "d": "One click above. FPLN gets its own window, a taskbar and Start-menu icon, and it works offline."
+   },
+   {
+    "t": "Pre-flight setup",
+    "d": "Pick your class and company, switch on minute calls and your alarm, test the sound and choose a theme."
+   },
+   {
+    "t": "Fly",
+    "d": "Load your BUFF card or syllabi so FPLN fills in your week. Updates arrive by themselves; you never download it again."
+   }
+  ]
+ },
+ "features": {
+  "title": "Everything a cadet runs on",
+  "sub": "The first productivity app built by cadets, for cadets. Built for tomorrow.",
+  "items": [
+   {
+    "t": "Minute calls",
+    "d": "10, 5, 4, 3, 2 before each formation, with your own times and days."
+   },
+   {
+    "t": "Wake-up alarm",
+    "d": "Rings with sound and a notification, even with the screen off, then reads you your flight plan."
+   },
+   {
+    "t": "Tasks & Canvas",
+    "d": "Assignments and deadlines in one list. Import your Canvas list in seconds."
+   },
+   {
+    "t": "Uniform & OPORDs",
+    "d": "Uniform of the day with the gear board, and a weekly order you can plan and send."
+   },
+   {
+    "t": "Post map with hours",
+    "d": "Grant Hall, the library, Arvin and the rest, with what's open right now."
+   },
+   {
+    "t": "Flight plan",
+    "d": "A pilot-style brief of your day: route, weather, uniform, deadlines and hazards. Read aloud or sent to your phone."
+   }
+  ]
+ },
+ "trust": {
+  "t": "Your data stays on your device",
+  "d": "Nothing you enter is uploaded; there's no account and no server holding your plan. Automatic safety checks run on every update. Keep CUI out of FPLN: no FRAGORDs, rosters or other cadets' personal information."
+ },
+ "faq": {
+  "title": "Questions",
+  "items": [
+   {
+    "q": "Do I ever need to download it again?",
+    "a": "No. FPLN checks for a newer version every time it opens and while it runs. When one is ready you'll see “Update ready · Restart now.”"
+   },
+   {
+    "q": "Will the alarm work with the screen off?",
+    "a": "Yes, while FPLN is open. On a laptop, keep it plugged in. The Windows download includes “FPLN keep awake”, which stops Windows from sleeping while plugged in (and an undo file). For extra safety, Wake up › Back up alarms to my phone."
+   },
+   {
+    "q": "Where is my data, and who can see it?",
+    "a": "Only on the device you use, inside the browser that runs FPLN. Nothing goes to a server, and no one else can see it. More › Backup moves it to a new computer."
+   },
+   {
+    "q": "The Install button didn't do anything.",
+    "a": "FPLN may already be installed: look for it in your Start menu or taskbar. Otherwise, in Edge or Chrome open the ⋯ menu › Apps › Install this site as an app. Firefox can't install apps; use Edge or Chrome, or just use FPLN in the browser."
+   },
+   {
+    "q": "How do I uninstall it?",
+    "a": "Open FPLN, click ⋯ at the top right › Uninstall. On a phone, press and hold the icon › Remove."
+   },
+   {
+    "q": "Is this an official USMA app?",
+    "a": "No. FPLN is a cadet project in beta, not an official USMA or U.S. Army product. Send feedback with the speech-bubble button in the app."
+   }
+  ]
+ },
+ "footer": "FPLN · Flight Plan, beta 1. A cadet project, not an official USMA or U.S. Army product. Map data © OpenStreetMap contributors.",
+ "layout": {
+  "align": "left",
+  "wordmark": "m",
+  "phoneShots": true,
+  "phoneOrder": "text",
+  "phoneWordmark": "m",
+  "phoneCompact": false,
+  "phoneAlign": "left"
+ }
 }

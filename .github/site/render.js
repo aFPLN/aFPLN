@@ -8,7 +8,7 @@ var FPLNSITE = (function(){
   var ICONS = {
     clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.2 2"/>', bell:'<path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
     list:'<path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/>', doc:'<path d="M8 4h9l3 3v13H8z"/><path d="M4 8v12h12"/><path d="M11 11h6M11 15h6"/>',
-    pin:'<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>', calendar:'<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9h17M8 3v3M16 3v3"/>',
+    pin:'<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>', calendar:'<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9h17M8 3v3M16 3v3"/>', plane:'<path d="M10.5 20l1.5-1 1.5 1v-3.5L21 13v-2l-7.5 2.5V6.5a1.5 1.5 0 0 0-3 0v7L3 11v2l7.5 3.5z"/>',
     shield:'<path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>', plane:'<path d="M3 13.5l7-1.5 4.5-7.5 2 .5-2 7.5 5.5.5 1 2-6.5 1-3 5.5-2-.5 1-5.5-6.5-1z"/>',
     phone:'<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/>', laptop:'<rect x="5" y="5" width="14" height="10" rx="1.5"/><path d="M3 18h18"/>',
     star:'<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/>', download:'<path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/>',
@@ -113,7 +113,7 @@ var FPLNSITE = (function(){
   function fromV1(c){ c = c || {}; var sh = c.show || {}, L = c.layout || {}, B = [];
     B.push({id:"hero", type:"hero", kicker:c.kicker, wordmark:c.wordmark || "FPLN", tagline:c.tagline, subline:c.subline, lead:c.lead, button:c.button, buttonSub:c.buttonSub, bullets:c.bullets || [], image:sh.shots === false ? "" : "@desktop", phone:sh.shots === false ? "" : "@phone", side:"right", wm:L.wordmark || "m", align:L.align || "left", hidePhone:false});
     if(sh.steps !== false && c.steps) B.push({id:"steps", type:"cards", title:c.steps.title, sub:c.steps.sub, cols:3, numbered:true, items:(c.steps.items || []).map(function(x){ return {t:x.t, d:x.d}; })});
-    var ic = ["clock","bell","list","doc","pin","calendar"];
+    var ic = ["clock","bell","list","doc","pin","plane"];
     if(sh.features !== false && c.features) B.push({id:"features", type:"cards", anchor:"features", navLabel:"Features", title:c.features.title, sub:c.features.sub, cols:3, items:(c.features.items || []).map(function(x, i){ return {icon:ic[i] || "star", t:x.t, d:x.d}; })});
     if(sh.trust !== false && c.trust) B.push({id:"trust", type:"callout", icon:"shield", tone:"gold", title:c.trust.t, text:c.trust.d});
     if(sh.other !== false) B.push(DEF_WAYS());
