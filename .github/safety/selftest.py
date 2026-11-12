@@ -86,11 +86,22 @@ with sync_playwright() as p:
     xs = page.evaluate("""() => { const X = document.getElementById('fClock').contentWindow.XLSX; const wb = X.utils.book_new(); X.utils.book_append_sheet(wb, X.utils.aoa_to_sheet([['Task','Due'],['WPR 2','2026-11-10']]), 'S');
       const buf = X.write(wb, {type:'array', bookType:'xlsx'}); const back = X.read(buf, {type:'array'}); return X.utils.sheet_to_csv(back.Sheets.S); }""")
     check(G, "Spreadsheet reader works", "WPR 2" in xs, xs[:40])
+    # the live monitor is for the owner's device only
+    page.evaluate("window.FPLN_SAFE && window.FPLN_SAFE.monitor()"); time.sleep(.5)
+    check(G, "Live monitor hidden from regular users", page.evaluate("!document.getElementById('fplnMon') || document.getElementById('fplnMon').hidden"))
+    # CUI check: fake CUI (built from pieces so the release scan doesn't flag this file) is refused; ordinary notes pass
+    fake = ["C"+"UI//SP-PRVCY training notes", "FRAG"+"ORD 12 to OP"+"ORD 26-04", "FOR OFFICIAL "+"USE ONLY", "Cadet 123-45-"+"6789", "DISTRIBUTION "+"STATEMENT D"]
+    hits = page.evaluate("t => t.map(x => !!FPLN_CUI.find(x))", fake)
+    check(G, "CUI check catches fake CUI", all(hits), hits)
+    check(G, "CUI check passes ordinary notes", not page.evaluate("!!FPLN_CUI.find('Breakfast formation 0650, ACU under Level 5. CDT Smith OIC. Call 845-938-3030.')"))
+    r = page.evaluate("t => fetch('https://docs.google.com/forms/d/e/1FAIpQLSf2YdE91QlvrLtVRfqKF-KoC-do04QxvXyvM3vY6dF4BQavlw/formResponse',{method:'POST',mode:'no-cors',body:new URLSearchParams({'entry.1832434695':t})}).then(()=>'sent',e=>String(e.message))", fake[0])
+    check(G, "CUI never leaves the device", "CUI" in r and r != "sent", r[:60])
+    page.evaluate("localStorage.setItem('fpln:owner','1')")
     page.evaluate("window.FPLN_SAFE && window.FPLN_SAFE.monitor()"); time.sleep(1.5)
     ev = page.evaluate("window.FPLN_MONITOR ? window.FPLN_MONITOR.events() : []")
     check(G, "Live monitor opens and records", page.evaluate("!!document.getElementById('fplnMon') && !document.getElementById('fplnMon').hidden") and any(e["k"] == "signal" for e in ev) and any(e["k"] == "boot" for e in ev), len(ev))
     check(G, "Monitor records no content", "BIT TASK" not in json.dumps(ev) and "BIT TASK" not in (page.evaluate("localStorage.getItem('fpln:rec')") or ""))
-    page.evaluate("document.getElementById('fplnMon').hidden = true")
+    page.evaluate("document.getElementById('fplnMon').hidden = true"); page.evaluate("localStorage.removeItem('fpln:owner')")
 
     G = "Pause"
     sig("freeze", "--msg", "BIT pause"); nudge(page)
