@@ -60,7 +60,7 @@ Everything for FPLN in one place.
 
 2 Share\\
    banner.png .................. the FPLN picture to text or post (with QR code)
-   email-picture.jpg ........... the picture used in the email banner
+   email-picture.png ........... the picture used in the email banner
    badge.png, badge-gold.png ... install badges
    qr-code.png ................. scan to install (phones)
    link-preview.png ............ what a pasted link looks like in chats
@@ -80,7 +80,7 @@ Keep CUI out of FPLN. Your data stays on your own device.
 files = []
 for f in ["Install FPLN.cmd", "FPLN keep awake.cmd", "FPLN undo keep awake.cmd", "FPLN (web link).url", "README.txt", "FPLN.ico"]:
     with zipfile.ZipFile("download/FPLN-beta.zip") as z: files.append(("1 Install FPLN/" + f, z.read("FPLN/" + f)))
-for src, dst in [("share/banner.png","banner.png"),("share/banner-email.jpg","email-picture.jpg"),("share/badge.png","badge.png"),("share/badge-gold.png","badge-gold.png"),("share/qr.png","qr-code.png"),("share/og.png","link-preview.png")]:
+for src, dst in [("share/banner.png","banner.png"),("share/banner-email.png","email-picture.png"),("share/badge.png","badge.png"),("share/badge-gold.png","badge-gold.png"),("share/qr.png","qr-code.png"),("share/og.png","link-preview.png")]:
     files.append(("2 Share/" + dst, open(src, "rb").read()))
 files.append(("2 Share/Email banner.html", email.encode()))
 files.append(("2 Share/message.txt", msg.replace("\n", "\r\n").encode("utf-8-sig")))
