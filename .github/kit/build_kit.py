@@ -19,6 +19,7 @@ h1{margin:0 0 8px;font:700 clamp(28px,5vw,40px)/1.1 "Segoe UI",sans-serif}
 p{margin:0 0 22px;color:#c3d1de;max-width:40em}
 .stage{background:#eef2f6;border-radius:18px;padding:28px 18px;border:1px solid rgba(226,189,116,.45);box-shadow:0 30px 70px -30px #000}
 .stage>table{margin:0 auto}
+@media (max-width:480px){.stage{padding:14px 6px}.wrap{padding-left:10px;padding-right:10px}}
 .row{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 0}
 button{all:unset;box-sizing:border-box;cursor:pointer;padding:14px 22px;border-radius:12px;font:700 14px/1 "Segoe UI",sans-serif;letter-spacing:.12em;text-transform:uppercase}
 .pri{background:linear-gradient(180deg,#f6dca2,#d5a95c);color:#1a1205;box-shadow:0 14px 30px -12px rgba(226,189,116,.8)}
@@ -58,8 +59,8 @@ Everything for FPLN in one place.
    FPLN (web link) ............. opens FPLN in your browser
 
 2 Share\\
-   banner.png .................. the big FPLN banner (with QR code)
-   email-banner.png ............ the picture used in the email banner
+   banner.png .................. the FPLN picture to text or post (with QR code)
+   email-picture.jpg ........... the picture used in the email banner
    badge.png, badge-gold.png ... install badges
    qr-code.png ................. scan to install (phones)
    link-preview.png ............ what a pasted link looks like in chats
@@ -79,7 +80,7 @@ Keep CUI out of FPLN. Your data stays on your own device.
 files = []
 for f in ["Install FPLN.cmd", "FPLN keep awake.cmd", "FPLN undo keep awake.cmd", "FPLN (web link).url", "README.txt", "FPLN.ico"]:
     with zipfile.ZipFile("download/FPLN-beta.zip") as z: files.append(("1 Install FPLN/" + f, z.read("FPLN/" + f)))
-for src, dst in [("share/banner.png","banner.png"),("share/banner-email.png","email-banner.png"),("share/badge.png","badge.png"),("share/badge-gold.png","badge-gold.png"),("share/qr.png","qr-code.png"),("share/og.png","link-preview.png")]:
+for src, dst in [("share/banner.png","banner.png"),("share/banner-email.jpg","email-picture.jpg"),("share/badge.png","badge.png"),("share/badge-gold.png","badge-gold.png"),("share/qr.png","qr-code.png"),("share/og.png","link-preview.png")]:
     files.append(("2 Share/" + dst, open(src, "rb").read()))
 files.append(("2 Share/Email banner.html", email.encode()))
 files.append(("2 Share/message.txt", msg.replace("\n", "\r\n").encode("utf-8-sig")))
