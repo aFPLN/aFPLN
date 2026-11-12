@@ -1,5 +1,5 @@
 {
- "bytes": 3663642,
+ "bytes": 3330409,
  "version": "0.8.4 beta 1 \u00b7 11 Nov 2026",
  "files": [
   "README.txt",
@@ -13,7 +13,6 @@
   "2 Share/email-picture.png",
   "2 Share/badge.png",
   "2 Share/badge-gold.png",
-  "2 Share/qr-code.png",
   "2 Share/link-preview.png",
   "2 Share/Email banner.html",
   "2 Share/message.txt",

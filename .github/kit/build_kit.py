@@ -29,7 +29,7 @@ button:focus-visible{outline:3px solid #8fd6ff;outline-offset:3px}
 ol{color:#9fb2c6;padding-left:20px;margin:26px 0 0}li{margin:0 0 6px}
 </style></head><body><div class="wrap">
 <p class="k">FPLN · Email banner</p><h1>Drop it into any email.</h1>
-<p>Click <b>Copy banner</b>, then paste it into Gmail, Outlook, Teams or a Google Doc with <b>Ctrl+V</b>. The picture, the QR code, the Install FPLN button and the links all stay clickable and open the install page.</p>
+<p>Click <b>Copy banner</b>, then paste it into Gmail, Outlook, Teams or a Google Doc with <b>Ctrl+V</b>. The picture, the Get FPLN button and the links all stay clickable and open the install page.</p>
 <div class="stage" id="banner">@@BLOCK@@</div>
 <div class="row"><button class="pri" id="cp">Copy banner</button><button class="gh" id="code">Copy HTML code</button></div>
 <div id="msg" role="status" aria-live="polite"></div>
@@ -59,10 +59,9 @@ Everything for FPLN in one place.
    FPLN (web link) ............. opens FPLN in your browser
 
 2 Share\\
-   banner.png .................. the FPLN picture to text or post (with QR code)
+   banner.png .................. the FPLN picture to text or post
    email-picture.png ........... the picture used in the email banner
    badge.png, badge-gold.png ... install badges
-   qr-code.png ................. scan to install (phones)
    link-preview.png ............ what a pasted link looks like in chats
    Email banner.html ........... open it, click Copy banner, paste into any email (stays clickable)
    message.txt ................. ready-made text to send people
@@ -80,7 +79,7 @@ Keep CUI out of FPLN. Your data stays on your own device.
 files = []
 for f in ["Install FPLN.cmd", "FPLN keep awake.cmd", "FPLN undo keep awake.cmd", "FPLN (web link).url", "README.txt", "FPLN.ico"]:
     with zipfile.ZipFile("download/FPLN-beta.zip") as z: files.append(("1 Install FPLN/" + f, z.read("FPLN/" + f)))
-for src, dst in [("share/banner.png","banner.png"),("share/banner-email.png","email-picture.png"),("share/badge.png","badge.png"),("share/badge-gold.png","badge-gold.png"),("share/qr.png","qr-code.png"),("share/og.png","link-preview.png")]:
+for src, dst in [("share/banner.png","banner.png"),("share/banner-email.png","email-picture.png"),("share/badge.png","badge.png"),("share/badge-gold.png","badge-gold.png"),("share/og.png","link-preview.png")]:
     files.append(("2 Share/" + dst, open(src, "rb").read()))
 files.append(("2 Share/Email banner.html", email.encode()))
 files.append(("2 Share/message.txt", msg.replace("\n", "\r\n").encode("utf-8-sig")))

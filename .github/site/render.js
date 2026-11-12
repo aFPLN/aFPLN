@@ -4,7 +4,7 @@
 var FPLNSITE = (function(){
   "use strict";
   var FONTS = ["Chakra Petch","Barlow","Inter","Oswald","Rajdhani","Teko","Bebas Neue","Montserrat","Saira","Saira Condensed","Exo 2","Orbitron","Roboto","Roboto Condensed","Source Sans 3","Merriweather","Playfair Display","Space Grotesk","IBM Plex Sans","IBM Plex Mono","B612","B612 Mono","Archivo","Archivo Black","Black Ops One","Stardos Stencil","Allerta Stencil","Russo One","Titillium Web","Barlow Condensed"];
-  var IMG = {"@desktop":"shot-desktop.png", "@phone":"shot-phone.png", "@banner":"../share/banner.png", "@preview":"../share/og.png", "@qr":"../share/qr.png", "@icon":"../icons/icon-512.png", "@badge":"../share/badge.png"};
+  var IMG = {"@desktop":"shot-desktop.png", "@phone":"shot-phone.png", "@banner":"../share/banner.png", "@preview":"../share/og.png", "@icon":"../icons/icon-512.png", "@badge":"../share/badge.png"};
   var ICONS = {
     clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.2 2"/>', bell:'<path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 1.5h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
     list:'<path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/>', doc:'<path d="M8 4h9l3 3v13H8z"/><path d="M4 8v12h12"/><path d="M11 11h6M11 15h6"/>',
