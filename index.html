@@ -613,6 +613,7 @@
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
 </script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="application-name" content="FPLN"><meta name="description" content="FPLN (Flight Plan): never miss a formation again. Built for tomorrow."><meta property="og:type" content="website"><meta property="og:site_name" content="FPLN · Flight Plan"><meta property="og:title" content="FPLN · Own the day."><meta property="og:description" content="Alarm. Planner. Assistant. The first productivity app built by cadets, for cadets. Built for tomorrow."><meta property="og:url" content="https://afpln.github.io/aFPLN/"><meta property="og:image" content="https://afpln.github.io/aFPLN/share/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://afpln.github.io/aFPLN/share/og.png"><script>window.FPLN_APP_BUILD=true;</script><script>window.FPLN_HOSTED=true;</script><title>FPLN</title><link rel="icon" href="favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#070a0f"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="FPLN"><style>*,*::before,*::after{box-sizing:border-box}html,body{margin:0;padding:0}</style></head><body>
+<div class="wco" aria-hidden="true"><img src="icons/icon-32.png" alt="" width="16" height="16"><span>FPLN</span><small>Flight Plan</small></div>
 <script>
 /* Launch screen: the sim-style background generator plays while FPLN loads. Skipped in tests, when framed, or when turned off in Display. */
 (function(){
@@ -689,6 +690,19 @@ nav.bar .dot:empty{display:none}
 }
 @media (min-width:900px) and (max-height:900px){nav.bar{gap:2px;padding:12px 8px;overflow-y:auto;scrollbar-width:none}nav.bar button{height:52px}nav.bar .brand{padding:0 0 10px}nav.bar .brand img{width:52px;height:52px}nav.bar .tools{gap:2px}}
 @media (min-width:900px) and (max-height:760px){nav.bar button{height:46px}nav.bar button svg{width:18px;height:18px}}
+/* Installed on a computer, FPLN draws its own title bar (window controls overlay). Windows only lets you move a window by a
+   region the app marks as draggable, so this strip is it: grab it to move FPLN, double-click it to maximize. */
+.wco{display:none}
+@media (display-mode: window-controls-overlay){
+  .wco{display:flex;position:fixed;z-index:90;left:0;right:0;top:0;height:env(titlebar-area-height,33px);padding:0 calc(100% - env(titlebar-area-width,100%) - env(titlebar-area-x,0px) + 12px) 0 calc(env(titlebar-area-x,0px) + 12px);align-items:center;gap:8px;
+    background:linear-gradient(180deg,#0b1220,#070a0f);border-bottom:1px solid var(--line-hi);app-region:drag;-webkit-app-region:drag;-webkit-user-select:none;user-select:none;cursor:default}
+  .wco img{width:16px;height:16px;border-radius:4px}
+  .wco span{font:700 11px/1 var(--f-disp);letter-spacing:.32em;color:var(--cy)}
+  .wco small{font:600 10px/1 var(--f-disp);letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+  .views{top:env(titlebar-area-height,33px)}
+  .armwarn,.scwarn{top:calc(env(titlebar-area-height,33px) + 12px)}
+}
+@media (display-mode: window-controls-overlay) and (min-width:900px){ nav.bar{top:env(titlebar-area-height,33px)} }
 
 /* ---------- pre-flight: load everything ---------- */
 .ix{position:fixed;inset:0;z-index:20;background:rgba(2,5,9,.86);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:grid;place-items:center;
@@ -1854,7 +1868,7 @@ var DISP = (function(){
 DISP.apply();
 
 /* ================= Feedback: straight to the developer's Google Form, anonymous by default ================= */
-var FPLN_VERSION = "0.9.0 beta 1 \u00b7 12 Nov 2026";
+var FPLN_VERSION = "0.9.1 beta 1 \u00b7 14 Nov 2026";
 var FB = (function(){
   var FORM = "https://docs.google.com/forms/d/e/1FAIpQLSf2YdE91QlvrLtVRfqKF-KoC-do04QxvXyvM3vY6dF4BQavlw/";
   var F_MSG = "entry.1832434695", F_NAME = "entry.1191502103", QKEY = "fpln:fbq";
