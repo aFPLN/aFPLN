@@ -964,9 +964,9 @@ textarea:focus{border-color:var(--cy);outline:none;box-shadow:0 0 0 1px var(--cy
 <div class="mus" id="mus" hidden role="dialog" aria-label="Music">
   <div class="row" style="justify-content:space-between"><span class="lbl" style="color:var(--cy);text-shadow:0 0 8px rgba(62,240,255,.5)">Cabin audio</span><button type="button" class="x" id="musX" aria-label="Close">×</button></div>
   <div class="st" id="musSt"></div>
-  <div class="st musinst" id="musInst" role="group" aria-label="Instruments"><button type="button" data-real="1" id="musReal" aria-pressed="false">Real orchestra<small>New: recorded instruments</small></button><button type="button" data-real="0" id="musSyn" aria-pressed="true">Classic<small>The original synth sound</small></button></div>
+  <div class="st musinst" id="musInst" role="group" aria-label="Instruments"><button type="button" data-real="1" id="musReal" aria-pressed="true">Real instruments<small>Recorded orchestra, band and synths</small></button><button type="button" data-real="0" id="musSyn" aria-pressed="false">Classic<small>The original synth songs</small></button></div>
   <label class="row" style="flex-wrap:nowrap"><span class="note" style="width:56px">Volume</span><input type="range" id="musVol" min="0" max="100"></label>
-  <p class="note">Original music, made live on your device. Real orchestra uses recorded piano, strings, horn, flute and harp (VS Chamber Orchestra, free to use) and downloads about 2 to 6 MB the first time. It quiets down for minute calls, the alarm and focus sounds.</p>
+  <p class="note">Original music, made live on your device. Real instruments are recordings: VS Chamber Orchestra (Versilian Studios) and Virtuosity Drums, both CC0, and FluidR3 GM by Frank Wen (CC BY 3.0). Each station downloads 2 to 8 MB the first time. It quiets down for minute calls, the alarm and focus sounds.</p>
 </div>
 
 <div class="ix" id="fb" hidden role="dialog" aria-modal="true" aria-labelledby="fbT">
@@ -1138,10 +1138,14 @@ var SAMP = (function(){
     if(layer){ var Lv = rows.filter(function(r){ return r.v === layer; }); if(Lv.length) L = Lv; }
     var best = null, bd = 1e9; L.forEach(function(r){ var d = Math.abs(r.m - m) + (r.m < m ? .01 : 0); if(d < bd){ bd = d; best = r; } });
     return best && bufs[best.f] ? {buf:bufs[best.f], m:best.m + (best.c||0)/100} : null; }
-  return {load:load, pick:pick, has:function(n){ return !!ready[n]; }, manifest:manifest};
+  /* a drum hit: soft or medium recording by velocity */
+  function hit(kit, key, vel){ var rows = ready[kit]; if(!rows) return null; var L = rows.filter(function(r){ return r.k === key; }); if(!L.length) return null;
+    var r = L.filter(function(x){ return x.v === (vel < .4 ? 1 : 2); })[0] || L[0]; return bufs[r.f] || null; }
+  return {load:load, pick:pick, hit:hit, has:function(n){ return !!ready[n]; }, manifest:manifest};
 })();
 var USES = {piano:["piano"], strings:["violins","violas","cellos"], cello:["cellos"], horn:["horn"], flute:["flute"], harp:["harp"], bell:["glock"], timp:["timpani"], roll:["timpani"]};
-function needs(song){ var src = String(song.bar), out = {}; Object.keys(USES).forEach(function(k){ if(new RegExp("E\\." + k + "\\(").test(src)) USES[k].forEach(function(n){ out[n] = 1; }); }); return Object.keys(out); }
+function needs(song){ var src = String(song.bar), out = {}; Object.keys(USES).forEach(function(k){ if(new RegExp("E\\." + k + "\\(").test(src)) USES[k].forEach(function(n){ out[n] = 1; }); });
+  src.replace(/E\.(?:inst|chord|hit)\("([a-z_]+)"/g, function(_, n){ out[n === "piano" ? "piano" : n] = 1; return _; }); return Object.keys(out); }
 
 function Engine(ctx, dest, bpm, opt){
   opt = opt || {};
@@ -1309,6 +1313,31 @@ function Engine(ctx, dest, bpm, opt){
     E.harp = function(m, t, vel, o){ o = o||{}; if(!sv("harp", m, t, null, (vel||.5)*KG.harp, {rev:o.rev == null ? .55 : o.rev, del:o.del, cut:o.cut ? o.cut*2 : 11000})) syn.harp(m, t, vel, o); };
     E.bell = function(m, t, vel, o){ o = o||{}; if(m < 72 || !sv("glock", m, t, null, (vel||.4)*KG.glock, {rev:o.rev == null ? .75 : o.rev, del:o.del == null ? .25 : o.del, cut:15000})) syn.bell(m, t, vel, o); };
     E.timp = function(m, t, v){ if(!sv("timpani", m, t, null, (v||.5)*KG.timpani, {rev:.45, cut:6000})) syn.timp(m, t, v); };
+    /* any recorded instrument by name. dur null = let it ring. */
+    var GAIN = {warm_pad:.28, poly_pad:.28, halo_pad:.3, sweep_pad:.28, synth_strings:.3, atmosphere:.3, choir:.32, oohs:.32, epiano:.55,
+      contrabass:.45, upright_bass:.62, finger_bass:.6, synth_bass:.55, bass_pizz:.55, tuba:.42, trombone:.36, trumpet:.36, horn:.4,
+      nylon:.5, steel:.48, clean_guitar:.45, violins_pizz:.42, cellos_pizz:.45, kalimba:.4, vibes:.45, celesta:.36, music_box:.34, glock:.24,
+      marimba:.45, xylophone:.32, tubular:.3, clarinet:.4, oboe:.36, bassoon:.4, flute:.36, whistle:.24, saw_lead:.26, square_lead:.22,
+      violins:.34, violas:.34, cellos:.38, violins_trem:.3, violins_spic:.36, harp:.6};
+    var REV = {warm_pad:.6, poly_pad:.5, halo_pad:.7, sweep_pad:.7, atmosphere:.8, choir:.7, oohs:.7, celesta:.6, music_box:.6, glock:.6, tubular:.7, kalimba:.45, whistle:.5, violins_trem:.6};
+    var FAM = {pad:["warm_pad","poly_pad","halo_pad","sweep_pad","synth_strings","atmosphere","choir","oohs"], bass:["contrabass","upright_bass","finger_bass","synth_bass","bass_pizz","tuba"],
+      pluck:["nylon","steel","clean_guitar","violins_pizz","cellos_pizz","kalimba"], mallet:["vibes","celesta","music_box","glock","marimba","xylophone","tubular"],
+      wind:["clarinet","oboe","bassoon","whistle","flute"], brass:["trumpet","trombone","horn"], lead:["saw_lead","square_lead"], str:["violins","violas","cellos","violins_trem","violins_spic"], keys:["epiano"]};
+    function famOf(n){ for(var f in FAM) if(FAM[f].indexOf(n) >= 0) return f; return ""; }
+    function stand(n, m, t, dur, vel, o){ var f = famOf(n), d = dur == null ? .8 : dur;
+      if(f === "pad") return E.pad([m], t, d, vel); if(f === "bass") return E.sub(m, t, d, vel); if(f === "pluck") return syn.harp(m, t, vel);
+      if(f === "mallet") return syn.bell(m, t, (vel||.4)*.6, {len:2}); if(f === "wind") return syn.flute(m, t, d, vel); if(f === "brass") return syn.horn(m, t, d, vel);
+      if(f === "lead") return E.lead(m, t, d, vel); if(f === "str") return syn.strings([m], t, d, vel); if(f === "keys") return E.rhodes(m, t, d, vel); }
+    E.inst = function(n, m, t, dur, vel, o){ o = o||{}; if(n === "piano") return E.piano(m, t, vel, o);
+      var g = (GAIN[n]||.4)*(vel||.5);
+      if(!sv(n, m, t, dur, g, {att:o.att || (dur == null ? .003 : .02), rel:o.rel || (dur == null ? .3 : .5), rev:o.rev == null ? (REV[n] == null ? .45 : REV[n]) : o.rev, del:o.del, cut:o.cut || 16000})) stand(n, m, t, dur, vel, o); };
+    E.chord = function(n, notes, t, dur, vel, o){ o = o||{}; var sp = o.spread || 0, v = (vel||.5)*1.3/Math.sqrt(notes.length);
+      notes.forEach(function(m, i){ E.inst(n, m, t + i*sp, dur, v, o); }); };
+    /* a drum hit from a recorded kit ("kit" = the full studio kit, "lofi" = the same kit through a lo-fi mic) */
+    var DG = {kick:.95, snare:.6, xstick:.55, hhc:.32, hho:.3, hhp:.3, ride:.3, bell:.3, crash:.34, ltom:.5, htom:.5};
+    E.hit = function(kit, key, t, vel, o){ o = o||{}; var v = vel == null ? .5 : vel, buf = SAMP.hit(kit, key, v);
+      if(!buf){ if(key === "kick") E.kick(t, v); else if(key === "snare") E.snare(t, v); else if(key === "xstick") E.rim(t, v); else if(key === "crash") E.cymbal(t, .05, v); else if(key === "ltom" || key === "htom") syn.timp(key === "ltom" ? 41 : 48, t, v*.6); else E.hat(t, v); return; }
+      var src = ctx.createBufferSource(), g = ctx.createGain(); src.buffer = buf; src.connect(g); g.gain.value = (DG[key]||.4)*v*(kit === "lofi" ? 1.1 : 1); src.start(t); send(g, o.rev == null ? (key === "crash" ? .35 : .12) : o.rev, o.del||0); };
   }
   return E;
 }
@@ -1484,9 +1513,210 @@ var SONGS = {};
     }};
 })();
 
+/* ============================ the songs, real-orchestra edition ============================
+   Same stations, keys and moods as the originals, rewritten for recorded instruments. Each bar is generated as it plays,
+   with small random choices, so a station never repeats exactly. */
+var SONGS2 = {};
+function pickOne(E, arr){ return arr[Math.floor(E.r()*arr.length) % arr.length]; }
+
+/* Horizon: golden-hour flight. D major, 66 BPM. Harp and strings, a piano theme, flute and oboe answers, a lift to E major with horns. */
+(function(){
+  var P = prog(["D2/D3 A3 E4 F#4","C#2/A3 C#4 E4","B1/B3 D4 F#4 A4","G1/G3 B3 D4 A4","F#2/A3 D4 F#4","G2/G3 B3 D4 F#4","E2/G3 B3 D4 E4","A1/A3 D4 E4"]);
+  var MA = seq("F#5:3 E5:1 | E5:2 C#5:1 A4:1 | D5:3 F#5:1 | B4:4 | A4:1 D5:1 F#5:1 A5:1 | G5:3 F#5:1 | E5:2 D5:1 B4:1 | C#5:2 E5:2");
+  var MB = seq("A5:2 B5:1 A5:1 | E5:4 | F#5:2 G5:1 A5:1 | D5:4 | D5:1 E5:1 F#5:1 B5:1 | A5:2 G5:1 F#5:1 | G5:2 F#5:1 E5:1 | E5:4");
+  var CM = seq("A4:4 | A4:4 | B4:2 D5:2 | D5:4 | D5:4 | B4:4 | B4:2 G4:2 | A4:2 C#5:2");
+  var CL = seq("r:2 A4:1 B4:1 | C#5:4 | r:2 F#4:1 A4:1 | D5:4 | r:2 C#5:1 D5:1 | E5:4 | r:2 G4:1 A4:1 | A4:4");
+  SONGS2.horizon = {name:"Horizon", bpm:66, opt:{verb:4.2, wet:.55, seed:11}, bed:["air", .02],
+    form:[["intro",4],["A",8],["B",8],["C",8],["A2",8],["outro",4]],
+    bar:function(E, t, s, b){ var B = E.B, tr = s==="C" ? 2 : 0, c = P[b % 8], N = c.n.map(function(x){ return x+tr; }), bass = c.b+tr;
+      var vol = {intro:.35, A:.45, B:.5, C:.75, A2:.4, outro:.3}[s];
+      E.strings(N, t, E.BAR-.3, vol, {att: s==="intro" ? 2.4 : 1.3, rel:2.4, bright: s==="C" ? .8 : .5});
+      E.inst("contrabass", bass+12 < 40 ? bass+12 : bass, t, E.BAR*.92, s==="intro"||s==="outro" ? .3 : .45, {att:.5, rel:1.4});
+      var up = N.concat(N.map(function(x){ return x+12; })).sort(function(a,b){ return a-b; });
+      if(s==="intro"||s==="outro"){ E.arp(up.slice(0,6), t, 4, 1, function(m, at, k){ E.harp(m, E.hum(at), .42 - k*.03); });
+        if(b%2===1) E.inst("celesta", up[up.length-1]+12, t+2*B, null, .3);
+        if(s==="intro") E.inst("violins_trem", N[N.length-1]+12, t, E.BAR-.2, .18, {att:2, rel:2});
+        if(s==="outro" && b===3) E.inst("tubular", N[0]+24 > 84 ? N[0]+12 : N[0]+24, t+2*B, null, .3);
+        return; }
+      E.arp(up, t, 4, .5, function(m, at, k){ E.harp(m, E.hum(at), k%2 ? .3 : .4); }, s==="C" ? [0,2,4,6,7,5,3,1] : [0,2,4,3,5,4,6,5]);
+      if(s==="A"){ E.mel(MA, b, t, function(m, at){ E.piano(m, E.hum(at,.008), .6); }); E.mel(CL, b, t, function(m, at, d){ E.inst("clarinet", m-12, at, d*.95, .35, {att:.12, rel:.6}); }); }
+      if(s==="A2"){ E.mel(MA, b, t, function(m, at){ E.piano(m-12, E.hum(at,.008), .45); }); if(b%2===0) E.inst("oohs", N[2]+12, t, E.BAR*2-.4, .22, {att:1.4, rel:2}); }
+      if(s==="B"){ E.mel(MB, b, t, function(m, at, d){ E.flute(m, at, d, .55); });
+        if(b%2===1) E.mel(MA, b, t, function(m, at, d){ if(d>=2) E.inst("oboe", m-12, at+B*.5, d*.8, .3, {att:.1, rel:.5}); });
+        E.inst("cellos_pizz", bass+12, t, null, .45); E.inst("cellos_pizz", bass+19, t+2*B, null, .35);
+        if(b>=4) E.chord("oohs", N.slice(1,4), t, E.BAR-.5, .2, {att:1.2, rel:2}); }
+      if(s==="C"){ E.mel(MA, b, t, function(m, at, d){ E.strings([m+tr, m+tr-12], at, Math.max(.4,d-.15), .55, {att:.18, rel:.9, bright:.85}); E.piano(m+tr, E.hum(at), .45); });
+        E.mel(CM, b, t, function(m, at, d){ E.horn(m+tr, at, d, .55); if(b>=6) E.inst("trumpet", m+tr+12, at, d, .25, {att:.1, rel:.5}); });
+        if(b===0){ E.timp(bass+24, t-2*B, .4); E.timp(bass+24, t-B, .55); E.hit("kit","crash", t, .35, {rev:.8}); }
+        if(b%4===0) E.timp(bass+24, t, .5);
+        if(b%2===1) E.inst("glock", N[N.length-1]+24, t+3*B, null, .25); }
+      if(s==="B" && b===7){ E.timp(c.b+24, t+2*B, .35); E.timp(c.b+24, t+3*B, .5); }
+      if(s==="A" && b%2===1 && E.r()<.5) E.inst("celesta", N[1]+24, t+3*B, null, .25);
+    }};
+})();
+
+/* Highlands: the Hudson at reveille, granite and gold. B-flat major, 70 BPM. A brass chorale: horns, trumpets, trombones and tuba, with strings, choir, snare and timpani. */
+(function(){
+  var P = prog(["Bb1/D3 F3 Bb3 D4","G1/D3 G3 Bb3 D4","Eb2/Eb3 G3 Bb3 Eb4","F1/F3 A3 C4 F4","D2/F3 Bb3 D4 F4","Eb2/Eb3 G3 Bb3 G4","C2/Eb3 G3 Bb3 Eb4","F1/F3 Bb3 C4 F4"]);
+  var MA = seq("F4:2 Bb4:1 C5:1 | D5:3 Bb4:1 | C5:2 Bb4:1 G4:1 | A4:4 | Bb4:2 D5:1 F5:1 | G5:3 Eb5:1 | D5:2 C5:1 Bb4:1 | C5:4");
+  var MB = seq("D5:2 Eb5:1 F5:1 | G5:2 F5:2 | Eb5:2 D5:1 C5:1 | D5:4 | F5:2 D5:1 Bb4:1 | Eb5:3 G5:1 | F5:2 Eb5:1 C5:1 | Bb4:4");
+  var CO = seq("Bb3:4 | Bb3:4 | G3:4 | F3:4 | F3:4 | G3:4 | G3:2 A3:2 | A3:4");
+  SONGS2.highlands = {name:"Highlands", bpm:70, opt:{verb:4.6, wet:.6, seed:23}, bed:["air", .015],
+    form:[["intro",4],["A",8],["B",8],["T",8],["calm",4]],
+    bar:function(E, t, s, b){ var B = E.B, c = P[b % 8], N = c.n;
+      if(s==="intro"){ E.strings(N.slice(0,3), t, E.BAR-.2, .35, {att:2, bright:.35}); E.inst("contrabass", c.b+12, t, E.BAR, .4, {att:.8});
+        if(b===0){ for(var r=0;r<12;r++) E.timp(c.b+24, t+r*B/4, .1+r*.03); }
+        if(b>=2) E.horn(nm("F4"), t+2*B, 2*B, .4);
+        if(b===3) E.hit("kit","snare", t+3.5*B, .25); return; }
+      if(s==="calm"){ E.strings(N, t, E.BAR-.4, .3, {att:1.8, bright:.35}); E.arp(N.concat(N.map(function(x){ return x+12; })), t, 4, .5, function(m, at){ E.harp(m, E.hum(at), .32); }, [0,1,2,3,4,5,6,7]);
+        if(b===1||b===3) E.inst("oboe", N[3], t+B, 2*B, .3, {att:.12}); if(b===2) E.flute(N[3]+12, t+B, 2*B, .35); return; }
+      var full = s==="T";
+      E.strings(N, t, E.BAR-.25, full ? .75 : s==="B" ? .55 : .45, {att: full ? .5 : 1, bright: full ? .85 : .5});
+      E.inst("contrabass", c.b+12, t, E.BAR-.2, full ? .55 : .45, {att:.3});
+      E.inst("tuba", c.b+12, t, E.BAR-.3, full ? .45 : .3, {att:.15, rel:.6});
+      E.chord("trombone", [N[0], N[1]].map(function(x){ return x > 64 ? x-12 : x; }), t, E.BAR-.3, full ? .4 : .28, {att:.15, rel:.6});
+      if(s==="A"){ E.mel(MA, b, t, function(m, at, d){ E.horn(m, at, d, .6); }); if(b%2===1) E.hit("kit","snare", t+3.5*B, .18); }
+      if(s==="B"){ E.mel(MB, b, t, function(m, at, d){ E.strings([m, m-12], at, Math.max(.4,d-.1), .55, {att:.25, rel:1, bright:.8}); });
+        E.chord("choir", N.slice(1).map(function(x){ return x+12 > 81 ? x : x+12; }), t, E.BAR-.4, .3, {att:1, rel:1.6});
+        E.mel(CO, b, t, function(m, at, d){ E.horn(m+12, at, d, .4); }); }
+      if(full){ E.mel(MA, b, t, function(m, at, d){ E.inst("trumpet", m, at, d, .45, {att:.06, rel:.5}); E.horn(m-12, at, d, .55); E.strings([m+12], at, Math.max(.4,d-.1), .4, {att:.15, rel:.8, bright:.9}); });
+        E.timp(c.b+24, t, .6); if(b%2===1) E.timp(c.b+31, t+2*B, .45);
+        E.hit("kit","snare", t+3*B, .22); E.hit("kit","snare", t+3.5*B, .3); if(b%4===3) for(var q=0;q<8;q++) E.hit("kit","snare", t+2*B+q*B/4, .12+q*.03);
+        if(b===0) E.hit("kit","crash", t, .45, {rev:.8}); E.chord("choir", N.slice(1), t, E.BAR-.4, .35, {att:.8, rel:1.4}); }
+      if(s==="B" && b===7){ for(var r2=0;r2<12;r2++) E.timp(c.b+24, t+B+r2*B/4, .1+r2*.05); }
+    }};
+})();
+
+/* Study Hall: a warm lo-fi beat for homework. 76 BPM with swing. Electric piano, upright bass, a dusty drum kit, nylon guitar and vibes. */
+(function(){
+  var P = prog(["F2/A3 E4 G4 C5","E2/D4 G4 B4","D2/F3 C4 E4 A4","C2/B3 D4 E4 G4","Bb1/A3 D4 F4","A1/G3 C4 E4","D2/F3 C4 E4 A4","G1/F3 C4 D4 G4"]);
+  var M = seq("E5:1.5 D5:.5 C5:1 A4:1 | B4:2 r:2 | A4:1 F5:1 E5:1 C5:1 | D5:2 r:2 | D5:1.5 C5:.5 Bb4:1 F4:1 | E4:2 G4:2 | A4:1 C5:1 F5:1 E5:1 | D5:4");
+  SONGS2.studyhall = {name:"Study Hall", bpm:76, opt:{verb:2.2, wet:.35, seed:5, tone:9000}, bed:["vinyl", .012],
+    form:[["intro",4],["A",8],["B",8],["A",8],["break",4]],
+    bar:function(E, t, s, b){ var B = E.B, c = P[b % 8], N = c.n, sw = function(e){ return E.swing(t, e, .24); };
+      var cv = s==="intro"||s==="break" ? .38 : .5;
+      E.chord("epiano", N, E.hum(t), 1.5*B, cv, {spread:.012, rel:.4});
+      if(s!=="intro") E.chord("epiano", N.slice(1), E.hum(sw(3)), 1.1*B, cv*.7, {spread:.01, rel:.3});
+      if(s==="break"){ if(b===3) E.inst("vibes", N[3]+12, sw(6), null, .4); if(b%2===0) E.inst("nylon", N[N.length-1], sw(5), null, .35); return; }
+      if(s==="intro"){ if(b>=2) E.hit("lofi","hhc", t+3*B, .3); return; }
+      // upright bass: root, a pickup to the fifth, and a passing note into the next chord
+      var nx = P[(b+1) % 8].b;
+      E.inst("upright_bass", c.b+12, t, 1.3*B, .6, {att:.005, rel:.15}); E.inst("upright_bass", c.b+19, sw(5), .45*B, .45, {att:.005, rel:.1});
+      E.inst("upright_bass", (nx+12) + (nx>c.b ? -1 : 1), sw(7), .4*B, .4, {att:.005, rel:.1});
+      // drums
+      E.hit("lofi","kick", t, .65); E.hit("lofi","kick", sw(5), .45); if(b%2) E.hit("lofi","kick", sw(7), .3);
+      E.hit("lofi","xstick", t+B, .55); E.hit("lofi","snare", t+3*B, .35); E.hit("lofi","xstick", t+3*B, .3);
+      for(var e=0;e<8;e++) E.hit("lofi", e===7 && b%4===3 ? "hho" : "hhc", sw(e), e%2 ? .3 : .45);
+      if(s==="B") E.mel(M, b, t, function(m, at, d){ E.inst("vibes", m, E.hum(at), null, .45); });
+      if(s==="A" && b%4===1) E.arp([N[N.length-1], N[N.length-2], N[1]].map(function(x){ return x+12; }), t+2*B, 2, .5, function(m, at){ E.inst("nylon", m-12, E.hum(sw(4+Math.round((at-t-2*B)/(B/2)))), null, .32); });
+    }};
+})();
+
+/* Nebula: drifting past a gas giant. C lydian, 84 BPM. Halo pads, a pulsing synth bass, celesta and music box stars, a choir, and a lead that lifts over a pedal. */
+(function(){
+  var P = prog(["C2/E3 B3 F#4 G4","A1/C4 E4 G4 B4","F2/A3 E4 G4 B4","C2/D4 F#4 A4","E2/D4 G4 B4","C2/D4 E4 G4 B4","C2/F3 Ab3 D4","G1/A3 B3 E4"]);
+  var M = seq("B4:2 C5:1 D5:1 | E5:3 F#5:1 | G5:2 E5:2 | F#5:4 | E5:1 F#5:1 G5:1 B5:1 | A5:3 G5:1 | Ab5:2 F5:1 D5:1 | D5:4");
+  SONGS2.nebula = {name:"Nebula", bpm:84, opt:{verb:5.5, wet:.7, seed:42}, bed:["air", .02],
+    form:[["intro",4],["A",8],["B",8],["C",8],["drift",4]],
+    bar:function(E, t, s, b){ var B = E.B, c = P[b % 8], N = c.n, up = N.concat(N.map(function(x){ return x+12; }));
+      E.chord("halo_pad", N, t, E.BAR-.3, s==="C" ? .5 : .4, {att:1.6, rel:3});
+      E.inst("synth_bass", c.b+12, t, E.BAR*.9, s==="intro"||s==="drift" ? .25 : .35, {att:.4, rel:1});
+      if(s==="intro"||s==="drift"){ if(b%2===0) E.inst("music_box", N[N.length-1]+12, t+B, null, .35); if(b===3) E.chord("sweep_pad", N.slice(1), t, E.BAR, .3, {att:2.4, rel:3});
+        if(b===1) E.inst("atmosphere", N[2]+12, t, 2*B, .3, {att:.6, rel:2}); return; }
+      E.arp(up, t, 4, .25, function(m, at, k){ E.inst("celesta", m+12 > 108 ? m : m+12, at, null, k%4===0 ? .28 : .18, {del:.35}); }, [0,2,4,1,3,5,2,6]);
+      for(var e=0;e<8;e++) E.inst("synth_bass", c.b+12, t+e*B/2, B*.3, e%2 ? .2 : .3, {att:.005, rel:.1});
+      if(s!=="A"){ E.hit("kit","kick", t, .45); E.hit("kit","kick", t+2*B, .35); if(s==="C"){ E.hit("kit","kick", t+B, .25); E.hit("kit","kick", t+3*B, .3); E.hit("kit","snare", t+B, .18, {rev:.9}); E.hit("kit","snare", t+3*B, .2, {rev:.9}); }
+        for(var h=1;h<8;h+=2) E.hit("kit","hhc", t+h*B/2, .22); }
+      if(s==="B"){ E.chord("oohs", N.slice(1), t, E.BAR-.4, .28, {att:1.2, rel:2}); if(b%2===0) E.inst("violins_trem", N[N.length-1]+12, t, E.BAR*2-.4, .15, {att:1.5, rel:2}); }
+      if(s==="C"){ E.mel(M, b, t, function(m, at, d){ E.inst("saw_lead", m, at, d*.95, .3, {att:.04, rel:.5, del:.35}); }); E.chord("choir", N.slice(1), t, E.BAR-.4, .25, {att:1, rel:1.8}); }
+      if(E.r()<.45) E.inst("music_box", pickOne(E, up)+12, t+B*Math.floor(E.r()*4), null, .25);
+      if(b===7){ E.chord("sweep_pad", N.slice(1), t, E.BAR, .3, {att:2, rel:2.5}); E.hit("kit","crash", t+3.5*B, .2, {rev:.9}); }
+    }};
+})();
+
+/* Grid: neon lines at night. D minor, 96 BPM. Synth bass, poly pads, arpeggios, a soaring saw lead and a big drum kit. */
+(function(){
+  var P = prog(["D2/D3 A3 D4 F4","Bb1/D3 F3 Bb3 D4","F1/C3 F3 A3 C4","C2/C3 G3 C4 E4"]);
+  var M = seq("A4:2 D5:1 E5:1 | F5:3 E5:1 | D5:2 C5:1 A4:1 | C5:4 | A4:2 D5:1 F5:1 | G5:3 F5:1 | E5:2 C5:2 | D5:4");
+  SONGS2.grid = {name:"Grid", bpm:96, opt:{verb:3.2, wet:.45, seed:3}, bed:["air", .012],
+    form:[["intro",4],["A",8],["B",8],["C",8],["A",8]],
+    bar:function(E, t, s, b){ var B = E.B, c = P[Math.floor(b/2) % 4], N = c.n, cyc = (b%8)/8;
+      if(b%2===0) E.chord("poly_pad", N, t, E.BAR*2-.4, s==="C" ? .45 : .35, {att:1, rel:1.8});
+      for(var e=0;e<8;e++) E.inst("synth_bass", c.b+12, t+e*B/2, B*.38, e%2 ? .26 : .36, {att:.004, rel:.08, cut:2400});
+      if(s==="intro"){ if(b===3) E.hit("kit","crash", t+3*B, .2, {rev:.9}); return; }
+      var cut = 800 + 3000*(.5-.5*Math.cos(cyc*Math.PI*2));
+      E.arp(N.map(function(x){ return x+12; }), t, 4, .25, function(m, at, k){ E.pluck(m+(k%8===7 ? 12 : 0), at, .3, {wave:"square", cut:cut, len:.18, q:6, del:.5}); }, [0,1,2,3,2,1,0,2,1,3,2,0,3,1,2,1]);
+      if(s!=="A"){ for(var k=0;k<4;k++) E.hit("kit","kick", t+k*B, .45); E.hit("kit","snare", t+B, .5, {rev:.6}); E.hit("kit","snare", t+3*B, .55, {rev:.6});
+        for(var h=0;h<8;h++) E.hit("kit", h%2 ? "hho" : "hhc", t+h*B/2, h%2 ? .2 : .3); if(b%8===0) E.hit("kit","crash", t, .35); }
+      else { E.hit("kit","kick", t, .5); E.hit("kit","kick", t+2.5*B, .35); for(var h2=1;h2<8;h2+=2) E.hit("kit","hhc", t+h2*B/2, .2); }
+      if(s==="B"||s==="C") E.mel(M, b, t, function(m, at, d){ E.inst("saw_lead", m+(s==="C" ? 12 : 0), at, d*.95, .32, {att:.03, rel:.4, del:.3}); });
+      if(s==="C" && b%2===0) E.chord("synth_strings", N.map(function(x){ return x+12; }), t, E.BAR*2-.3, .25, {att:.8, rel:1.5});
+      if(b===7){ E.hit("kit","ltom", t+3*B, .35); E.hit("kit","htom", t+3.5*B, .35); }
+    }};
+})();
+
+/* Lights Out: after Taps. A minor, 58 BPM. A soft horn plays the opening of Taps, then felt piano, cellos, violas, a warm pad, music box and rain. */
+(function(){
+  var PI = prog(["C2/E3 G3 C4","F1/F3 A3 C4","C2/E3 G3 C4","G1/D3 G3 B3"]);
+  var TAPS = seq("G4:.75 G4:.25 C5:3 | G4:.75 C5:.25 E5:3 | G4:.5 C5:.5 E5:1 G4:.5 C5:.5 E5:1 | G4:.5 C5:.5 E5:3");
+  var P = prog(["A1/A3 C4 E4 B4","F1/A3 C4 E4 G4","G1/G3 C4 E4 G4","E1/G#3 B3 E4"]);
+  var M = seq("E5:3 C5:1 | A4:4 | G4:2 C5:1 E5:1 | D5:2 B4:2 | C5:3 A4:1 | F5:2 E5:2 | D5:2 C5:1 B4:1 | B4:4");
+  SONGS2.lightsout = {name:"Lights Out", bpm:58, opt:{verb:4.4, wet:.6, seed:9, tone:8000}, bed:["rain", .02],
+    form:[["taps",4],["A",8],["B",8],["A2",8]],
+    bar:function(E, t, s, b){ var B = E.B;
+      if(s==="taps"){ var ci = PI[b], NI = ci.n; E.chord("warm_pad", NI, t, E.BAR-.4, .28, {att:2, rel:3}); E.inst("cellos", ci.b+12, t, E.BAR-.3, .25, {att:1.2, rel:2});
+        E.mel(TAPS, b, t, function(m, at, d){ E.horn(m-12, at, d*.95, .32, {att:.08, rel:1.2, rev:.85}); }); return; }
+      var c = P[Math.floor(b/2) % 4], N = c.n;
+      if(b%2===0){ E.chord("warm_pad", N, t, E.BAR*2-.6, .3, {att:2.4, rel:3.5}); E.cello(c.b+12, t, E.BAR*2-.5, .4); }
+      E.piano(c.b+12, E.hum(t), .32);
+      E.arp(N, t, 4, 1, function(m, at, k){ if(k) E.piano(m, E.hum(at,.02), .2); });
+      E.mel(M, b, t, function(m, at, d){ E.piano(m - (s==="A2" ? 12 : 0), E.hum(at,.015), s==="B" ? .42 : .36); if(s==="B") E.inst("violas", m-12, at, Math.max(.5,d-.2), .25, {att:.6, rel:1.6}); });
+      if(s==="B" && b%2===1) E.inst("music_box", N[N.length-1]+12, t+2.5*B, null, .22);
+      if(s==="A2" && b===7) E.inst("celesta", N[0]+24, t+2*B, null, .25);
+    }};
+})();
+
+/* Clear Skies: a bright morning climb. E major, 92 BPM. Fingerpicked steel guitar, piano, bass, a light kit, pizzicato strings and a whistle. */
+(function(){
+  var P = prog(["E2/E3 B3 E4 G#4","D#2/F#3 B3 D#4 F#4","C#2/E3 G#3 B3 E4","A1/A3 C#4 E4 B4","G#1/E3 G#3 B3 E4","A1/A3 C#4 E4 A4","F#1/F#3 A3 C#4 E4","B1/B3 E4 F#4"]);
+  var M = seq("G#5:1 B5:1 G#5:1 E5:1 | F#5:2 D#5:2 | E5:1 G#5:1 B5:1 C#6:1 | B5:4 | B5:1 C#6:1 B5:1 G#5:1 | A5:2 E5:2 | F#5:1 A5:1 C#6:1 B5:1 | B5:2 A5:1 F#5:1");
+  SONGS2.clearskies = {name:"Clear Skies", bpm:92, opt:{verb:2.4, wet:.4, seed:17}, bed:["air", .012],
+    form:[["intro",4],["A",8],["B",8],["A",8]],
+    bar:function(E, t, s, b){ var B = E.B, c = P[b % 8], N = c.n;
+      E.arp([c.b+12].concat(N), t, 4, .5, function(m, at, k){ E.inst("steel", m, E.hum(at,.01), null, k===0 ? .5 : .36); }, [0,2,3,4,1,3,2,4]);
+      if(s==="intro"){ if(b===3) E.inst("glock", N[N.length-1]+24, t+3*B, null, .25); return; }
+      E.inst("finger_bass", c.b+12, t, 2*B, .55, {att:.005, rel:.15}); E.inst("finger_bass", c.b+12, t+2.5*B, 1.2*B, .45, {att:.005, rel:.12});
+      E.chord("piano", N, t+2*B, null, .22, {spread:.01});
+      E.hit("kit","kick", t, .5); E.hit("kit","kick", t+2.5*B, .38); E.hit("kit","xstick", t+B, .35); E.hit("kit","xstick", t+3*B, .4);
+      for(var e=0;e<8;e++) E.hit("kit", "hhc", t+e*B/2+(e%2 ? .02 : 0), e%2 ? .28 : .18);
+      if(s==="B"){ E.mel(M, b, t, function(m, at, d){ E.inst("whistle", m, at, d*.9, .3, {att:.03, rel:.3, del:.25}); E.flute(m-12, at, d, .3); });
+        if(b%2===0) E.chord("violins_pizz", N.slice(1).map(function(x){ return x+12; }), t+B, null, .3, {spread:.02}); }
+      if(s==="A" && b%4===3) E.inst("glock", N[N.length-1]+24, t+3*B, null, .22);
+      if(s==="A" && b%2===1) E.inst("violins_pizz", N[N.length-1]+12, t+3.5*B, null, .3);
+    }};
+})();
+
+/* Arcade Sunrise: a gentle chiptune. C major, 108 BPM. 8-bit bass and arpeggios, a square-wave lead, and marimba when the sun comes up. */
+(function(){
+  var P = prog(["C2/C4 E4 G4","A1/A3 C4 E4","F1/F3 A3 C4","G1/G3 B3 D4"]);
+  var M = seq("E5:1 G5:1 C6:1 G5:1 | A5:2 E5:2 | F5:1 A5:1 C6:1 A5:1 | G5:3 r:1 | E5:1 G5:1 C6:1 D6:1 | E6:2 C6:2 | A5:1 C6:1 F5:1 A5:1 | G5:4");
+  SONGS2.arcade = {name:"Arcade Sunrise", bpm:108, opt:{verb:1.6, wet:.25, seed:8}, bed:null,
+    form:[["intro",2],["A",8],["B",8]],
+    bar:function(E, t, s, b){ var B = E.B, c = P[Math.floor(b/2) % 4], N = c.n;
+      for(var e=0;e<8;e++) E.chip(c.b+12+(e%2 ? 12 : 0), t+e*B/2, B*.4, .6, {tri:true});
+      E.arp(N.map(function(x){ return x+12; }), t, 4, .25, function(m, at){ E.chip(m, at, B*.2, .3, {del:.25}); });
+      if(s==="intro") return;
+      for(var h=0;h<8;h++) E.hat(t+h*B/2, h%2 ? .5 : .35); E.kick(t, .5); E.kick(t+2*B, .45); E.snare(t+B, .2); E.snare(t+3*B, .22);
+      if(s==="B"){ E.mel(M, b, t, function(m, at, d){ E.inst("square_lead", m, at, d*.85, .26, {att:.01, rel:.15, del:.3}); });
+        E.arp(N.map(function(x){ return x+12; }), t, 4, .5, function(m, at){ E.inst("marimba", m, at, null, .3); }, [0,1,2,1]); }
+      else E.mel(M, b, t, function(m, at, d){ if(d>=2) E.inst("square_lead", m-12, at, d*.85, .22, {att:.01, rel:.15}); });
+      if(b===7) E.inst("kalimba", N[2]+24 > 91 ? N[2]+12 : N[2]+24, t+3*B, null, .35);
+    }};
+})();
+
 /* ---- player ---- */
 function Player(ctx, dest, key, real){
-  var song = SONGS[key] || SONGS.horizon, bus = ctx.createGain(); bus.gain.value = (song.opt && song.opt.gain) || 1; bus.connect(dest);
+  var song = (real && SONGS2[key]) || SONGS[key] || SONGS.horizon, bus = ctx.createGain(); bus.gain.value = (song.opt && song.opt.gain) || 1; bus.connect(dest);
   if(real) SAMP.load(ctx, needs(song));
   var E = Engine(ctx, bus, song.bpm, Object.assign({}, song.opt, {real:!!real})), fi = 0, b = 0, n = 0, next = ctx.currentTime + .12, err = false;
   var bed = song.bed ? E.bed(song.bed[0], song.bed[1]) : [];
@@ -1498,7 +1728,7 @@ function Player(ctx, dest, key, real){
 }
 var LIST = [["horizon","Horizon","Golden-hour flight"],["highlands","Highlands","Horns over the Hudson"],["studyhall","Study Hall","Warm lo-fi beat"],["nebula","Nebula","Deep-space drift"],
   ["grid","Grid","Neon synth night"],["clearskies","Clear Skies","Bright morning climb"],["lightsout","Lights Out","After Taps, soft rain"],["arcade","Arcade Sunrise","Gentle chiptune"]];
-return {Player:Player, songs:SONGS, list:LIST, nm:nm, seq:seq, samples:SAMP, needs:function(k){ return needs(SONGS[k] || SONGS.horizon); }};
+return {Player:Player, songs:SONGS, list:LIST, nm:nm, seq:seq, samples:SAMP, needs:function(k, real){ return needs((real !== false && SONGS2[k]) || SONGS[k] || SONGS.horizon); }, songs2:SONGS2};
 })();
 
 </script>
@@ -1582,9 +1812,10 @@ var MUS = (function(){
   /* one song per theme ("Match theme"), or any song by name; the engine lives in music.js */
   var THEME_SONG = {horizon:"horizon", westpoint:"highlands", contemporary:"studyhall", scifi:"nebula", cockpit:"grid", night:"lightsout", daylight:"clearskies", retro:"arcade"};
   var OLD = {cruise:"clearskies", night:"lightsout"};
-  var st = {on:false, station:"auto", vol:55, real:false}, ctx = null, master = null, player = null, timer = null, duckUntil = 0, focusDuck = false;
+  var st = {on:false, station:"auto", vol:55, inst:"real"}, ctx = null, master = null, player = null, timer = null, duckUntil = 0, focusDuck = false;
   try{ var o = JSON.parse(localStorage.getItem("fpln:music")||"null"); if(o) st = Object.assign(st, o); }catch(e){}
   if(OLD[st.station]) st.station = OLD[st.station];
+  if(st.inst !== "classic") st.inst = "real"; st.real = st.inst === "real";
   function persist(){ try{ localStorage.setItem("fpln:music", JSON.stringify(st)); }catch(e){} }
   function songKey(){ if(st.station!=="auto") return st.station; var th = "horizon"; try{ th = DISP.state().theme; }catch(e){} return THEME_SONG[th] || "horizon"; }
   function songKeyAuto(){ var th = "horizon"; try{ th = DISP.state().theme; }catch(e){} return THEME_SONG[th] || "horizon"; }
@@ -1604,7 +1835,7 @@ var MUS = (function(){
     hp.connect(ls); ls.connect(pk); pk.connect(hs); hs.connect(lim); lim.connect(c.destination); return hp; }
   /* every song at the same loudness (measured through the mastering chain), so switching stations never jumps */
   var TRIM = {horizon:.4, highlands:.9, studyhall:-1.1, nebula:.4, grid:2.2, clearskies:.2, lightsout:1, arcade:2.1}, trimG = null;
-  var TRIM_REAL = {horizon:-1.6, highlands:-2.1, clearskies:-.6, lightsout:-2.5};   // recorded instruments sit a little louder
+  var TRIM_REAL = {horizon:-1.8, highlands:-2.1, studyhall:0, nebula:.6, grid:0, lightsout:1.4, clearskies:0, arcade:0};   // the real-instrument songs, matched to the classic levels
   function target(){ var d = Date.now() < duckUntil ? .08 : focusDuck ? .15 : 1; return st.on ? (st.vol/100)*.9*d : 0; }
   function level(fast){ if(master) master.gain.setTargetAtTime(target(), ctx.currentTime, fast ? .3 : 1.6); }
   function start(){ if(!ac()) return; var k = songKey();
@@ -1622,7 +1853,7 @@ var MUS = (function(){
     var t = document.querySelector('[data-tool="music"]'); if(t) t.setAttribute("aria-current", st.on ? "page" : "false");
   }
   $("musSt").addEventListener("click", function(e){ var b = e.target.closest("[data-stn]"); if(!b) return; var k = b.dataset.stn; if(st.on && st.station===k) st.on = false; else { st.on = true; st.station = k; } persist(); sync(); });
-  $("musInst").addEventListener("click", function(e){ var b = e.target.closest("[data-real]"); if(!b) return; st.real = b.dataset.real === "1"; persist(); if(st.on) start(); paint(); });
+  $("musInst").addEventListener("click", function(e){ var b = e.target.closest("[data-real]"); if(!b) return; st.real = b.dataset.real === "1"; st.inst = st.real ? "real" : "classic"; persist(); if(st.on) start(); paint(); });
   $("musVol").addEventListener("input", function(e){ st.vol = +e.target.value; persist(); level(true); });
   setTimeout(paint, 0);
   return {
@@ -1931,7 +2162,7 @@ var DISP = (function(){
 DISP.apply();
 
 /* ================= Feedback: straight to the developer's Google Form, anonymous by default ================= */
-var FPLN_VERSION = "0.9.2 beta 1 \u00b7 15 Nov 2026";
+var FPLN_VERSION = "0.10.0 beta 1 \u00b7 15 Nov 2026";
 var FB = (function(){
   var FORM = "https://docs.google.com/forms/d/e/1FAIpQLSf2YdE91QlvrLtVRfqKF-KoC-do04QxvXyvM3vY6dF4BQavlw/";
   var F_MSG = "entry.1832434695", F_NAME = "entry.1191502103", QKEY = "fpln:fbq";

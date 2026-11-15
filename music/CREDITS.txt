@@ -1,9 +1,20 @@
-FPLN "Real orchestra" instruments
+FPLN "Real instruments" — sample credits
 
-Samples from VS Chamber Orchestra: Community Edition by Versilian Studios
-(recorded by Sam Gossner and Simon Dalzell; sample cutting by Elan Hickler / Soundemote),
-released under CC0 1.0 Universal. https://github.com/sgossner/VSCO-2-CE
+VS Chamber Orchestra: Community Edition by Versilian Studios
+  Recorded by Sam Gossner and Simon Dalzell; sample cutting by Elan Hickler / Soundemote.
+  License: CC0 1.0 Universal. https://github.com/sgossner/VSCO-2-CE
+  Used for: piano, violins, violas, cellos, contrabass, harp, flute, clarinet, oboe, bassoon, horn,
+  trumpet, trombone, tuba, glockenspiel, marimba, xylophone, timpani, pizzicato, spiccato and tremolo strings.
+  Upright Piano sampled by Simon Dalzell of Ivy Audio; redistribution granted by Versilian Studios LLC.
 
-Upright Piano sampled by Simon Dalzell of Ivy Audio. Redistribution granted by Versilian Studios LLC.
+Virtuosity Drums (Virtuosity Musical Instruments, Boston; drummer Austin McMahon)
+  License: CC0 1.0 Universal. https://github.com/sfzinstruments/virtuosity_drums
+  Used for: the studio kit and the lo-fi kit.
 
-FPLN trimmed, leveled and re-encoded the notes it uses (mono MP3). Thank you to everyone who made these free.
+FluidR3 GM SoundFont by Frank Wen, as rendered by the MIDI.js Soundfonts project (Benjamin Gleitzman)
+  License: Creative Commons Attribution 3.0. https://github.com/gleitz/midi-js-soundfonts
+  Used for: electric piano, upright, finger and synth bass, nylon, steel and clean guitar, vibraphone,
+  celesta, music box, kalimba, choir, voice oohs, warm, poly, halo and sweep pads, synth strings,
+  atmosphere, saw and square leads, whistle and tubular bells.
+
+FPLN selected, trimmed, leveled and re-encoded the notes it uses (mono MP3). Thank you to everyone who made these free.
