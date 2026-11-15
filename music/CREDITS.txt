@@ -15,6 +15,6 @@ FluidR3 GM SoundFont by Frank Wen, as rendered by the MIDI.js Soundfonts project
   License: Creative Commons Attribution 3.0. https://github.com/gleitz/midi-js-soundfonts
   Used for: electric piano, upright, finger and synth bass, nylon, steel and clean guitar, vibraphone,
   celesta, music box, kalimba, choir, voice oohs, warm, poly, halo and sweep pads, synth strings,
-  atmosphere, saw and square leads, whistle and tubular bells.
+  atmosphere, saw and square leads, whistle, tubular bells, church organ and woodblock.
 
 FPLN selected, trimmed, leveled and re-encoded the notes it uses (mono MP3). Thank you to everyone who made these free.
