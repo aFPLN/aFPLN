@@ -1318,9 +1318,9 @@ function Engine(ctx, dest, bpm, opt){
       contrabass:.45, upright_bass:.62, finger_bass:.6, synth_bass:.55, bass_pizz:.55, tuba:.42, trombone:.36, trumpet:.36, horn:.4,
       nylon:.5, steel:.48, clean_guitar:.45, violins_pizz:.42, cellos_pizz:.45, kalimba:.4, vibes:.45, celesta:.36, music_box:.34, glock:.24,
       marimba:.45, xylophone:.32, tubular:.3, clarinet:.4, oboe:.36, bassoon:.4, flute:.36, whistle:.24, saw_lead:.26, square_lead:.22,
-      violins:.34, violas:.34, cellos:.38, violins_trem:.3, violins_spic:.36, harp:.6};
-    var REV = {warm_pad:.6, poly_pad:.5, halo_pad:.7, sweep_pad:.7, atmosphere:.8, choir:.7, oohs:.7, celesta:.6, music_box:.6, glock:.6, tubular:.7, kalimba:.45, whistle:.5, violins_trem:.6};
-    var FAM = {pad:["warm_pad","poly_pad","halo_pad","sweep_pad","synth_strings","atmosphere","choir","oohs"], bass:["contrabass","upright_bass","finger_bass","synth_bass","bass_pizz","tuba"],
+      violins:.34, violas:.34, cellos:.38, violins_trem:.3, violins_spic:.36, harp:.6, organ:.3, woodblock:.24};
+    var REV = {warm_pad:.6, poly_pad:.5, halo_pad:.7, sweep_pad:.7, atmosphere:.8, choir:.7, oohs:.7, celesta:.6, music_box:.6, glock:.6, tubular:.7, kalimba:.45, whistle:.5, violins_trem:.6, organ:.6, woodblock:.25};
+    var FAM = {pad:["warm_pad","poly_pad","halo_pad","sweep_pad","synth_strings","atmosphere","choir","oohs","organ"], bass:["contrabass","upright_bass","finger_bass","synth_bass","bass_pizz","tuba"],
       pluck:["nylon","steel","clean_guitar","violins_pizz","cellos_pizz","kalimba"], mallet:["vibes","celesta","music_box","glock","marimba","xylophone","tubular"],
       wind:["clarinet","oboe","bassoon","whistle","flute"], brass:["trumpet","trombone","horn"], lead:["saw_lead","square_lead"], str:["violins","violas","cellos","violins_trem","violins_spic"], keys:["epiano"]};
     function famOf(n){ for(var f in FAM) if(FAM[f].indexOf(n) >= 0) return f; return ""; }
@@ -1519,7 +1519,7 @@ var SONGS = {};
 var SONGS2 = {};
 function pickOne(E, arr){ return arr[Math.floor(E.r()*arr.length) % arr.length]; }
 
-/* Horizon: golden-hour flight. D major, 66 BPM. Harp and strings, a piano theme, flute and oboe answers, a lift to E major with horns. */
+/* Horizon: golden-hour flight. D major, 66 BPM. Strings and rolling piano, a piano theme, flute and oboe answers, a lift to E major with horns. */
 (function(){
   var P = prog(["D2/D3 A3 E4 F#4","C#2/A3 C#4 E4","B1/B3 D4 F#4 A4","G1/G3 B3 D4 A4","F#2/A3 D4 F#4","G2/G3 B3 D4 F#4","E2/G3 B3 D4 E4","A1/A3 D4 E4"]);
   var MA = seq("F#5:3 E5:1 | E5:2 C#5:1 A4:1 | D5:3 F#5:1 | B4:4 | A4:1 D5:1 F#5:1 A5:1 | G5:3 F#5:1 | E5:2 D5:1 B4:1 | C#5:2 E5:2");
@@ -1533,12 +1533,12 @@ function pickOne(E, arr){ return arr[Math.floor(E.r()*arr.length) % arr.length];
       E.strings(N, t, E.BAR-.3, vol, {att: s==="intro" ? 2.4 : 1.3, rel:2.4, bright: s==="C" ? .8 : .5});
       E.inst("contrabass", bass+12 < 40 ? bass+12 : bass, t, E.BAR*.92, s==="intro"||s==="outro" ? .3 : .45, {att:.5, rel:1.4});
       var up = N.concat(N.map(function(x){ return x+12; })).sort(function(a,b){ return a-b; });
-      if(s==="intro"||s==="outro"){ E.arp(up.slice(0,6), t, 4, 1, function(m, at, k){ E.harp(m, E.hum(at), .42 - k*.03); });
+      if(s==="intro"||s==="outro"){ E.arp(up.slice(0,6), t, 4, 1, function(m, at, k){ E.piano(m, E.hum(at,.01), .3 - k*.025); });
         if(b%2===1) E.inst("celesta", up[up.length-1]+12, t+2*B, null, .3);
         if(s==="intro") E.inst("violins_trem", N[N.length-1]+12, t, E.BAR-.2, .18, {att:2, rel:2});
         if(s==="outro" && b===3) E.inst("tubular", N[0]+24 > 84 ? N[0]+12 : N[0]+24, t+2*B, null, .3);
         return; }
-      E.arp(up, t, 4, .5, function(m, at, k){ E.harp(m, E.hum(at), k%2 ? .3 : .4); }, s==="C" ? [0,2,4,6,7,5,3,1] : [0,2,4,3,5,4,6,5]);
+      E.arp(up, t, 4, .5, function(m, at, k){ E.piano(m, E.hum(at,.008), k%2 ? .17 : .23); }, s==="C" ? [0,2,4,6,7,5,3,1] : [0,2,4,3,5,4,6,5]);
       if(s==="A"){ E.mel(MA, b, t, function(m, at){ E.piano(m, E.hum(at,.008), .6); }); E.mel(CL, b, t, function(m, at, d){ E.inst("clarinet", m-12, at, d*.95, .35, {att:.12, rel:.6}); }); }
       if(s==="A2"){ E.mel(MA, b, t, function(m, at){ E.piano(m-12, E.hum(at,.008), .45); }); if(b%2===0) E.inst("oohs", N[2]+12, t, E.BAR*2-.4, .22, {att:1.4, rel:2}); }
       if(s==="B"){ E.mel(MB, b, t, function(m, at, d){ E.flute(m, at, d, .55); });
@@ -1555,39 +1555,54 @@ function pickOne(E, arr){ return arr[Math.floor(E.r()*arr.length) % arr.length];
     }};
 })();
 
-/* Highlands: the Hudson at reveille, granite and gold. B-flat major, 70 BPM. A brass chorale: horns, trumpets, trombones and tuba, with strings, choir, snare and timpani. */
+/* Highlands: the Hudson at reveille, granite and gold. B-flat major, 84 BPM march. A bugle call, trumpets on the theme, horns, trombones and tuba, a snare cadence with flams and rolls, bass drum, timpani and choir. */
 (function(){
   var P = prog(["Bb1/D3 F3 Bb3 D4","G1/D3 G3 Bb3 D4","Eb2/Eb3 G3 Bb3 Eb4","F1/F3 A3 C4 F4","D2/F3 Bb3 D4 F4","Eb2/Eb3 G3 Bb3 G4","C2/Eb3 G3 Bb3 Eb4","F1/F3 Bb3 C4 F4"]);
-  var MA = seq("F4:2 Bb4:1 C5:1 | D5:3 Bb4:1 | C5:2 Bb4:1 G4:1 | A4:4 | Bb4:2 D5:1 F5:1 | G5:3 Eb5:1 | D5:2 C5:1 Bb4:1 | C5:4");
+  var MA = seq("F4:1.5 Bb4:.5 Bb4:.5 C5:.5 | D5:3 Bb4:1 | C5:1.5 Bb4:.5 G4:1 | A4:4 | Bb4:1.5 D5:.5 D5:.5 F5:.5 | G5:3 Eb5:1 | D5:1.5 C5:.5 Bb4:1 | C5:4");
   var MB = seq("D5:2 Eb5:1 F5:1 | G5:2 F5:2 | Eb5:2 D5:1 C5:1 | D5:4 | F5:2 D5:1 Bb4:1 | Eb5:3 G5:1 | F5:2 Eb5:1 C5:1 | Bb4:4");
   var CO = seq("Bb3:4 | Bb3:4 | G3:4 | F3:4 | F3:4 | G3:4 | G3:2 A3:2 | A3:4");
-  SONGS2.highlands = {name:"Highlands", bpm:70, opt:{verb:4.6, wet:.6, seed:23}, bed:["air", .015],
+  var CALL = seq("F4:.5 F4:.25 F4:.25 Bb4:1 D5:1 F5:1 | D5:.5 D5:.25 D5:.25 F5:1 Bb5:2 | F5:.5 F5:.25 F5:.25 D5:1 Bb4:1 D5:1 | F5:4");
+  /* a street beat on the snare: accents on 1 and 3, flams on 2 and 4, a roll into the next phrase when fill is set */
+  function cadence(E, t, v, fill){ var B = E.B, x = B/4, pat = [1,0,.35,.45, .8,0,.45,0, 1,0,.35,.45, .8,.35,.55,.4], n = fill ? 8 : 16;
+    for(var i=0;i<n;i++){ if(!pat[i]) continue; var at = t+i*x, vv = v*pat[i];
+      if(i===4||i===12) E.hit("kit","snare", at-.03, vv*.4, {rev:.15});
+      E.hit("kit","snare", at, vv, {rev:.15}); }
+    if(fill){ for(var r=0;r<12;r++) E.hit("kit","snare", t+2*B+r*B/6, v*(.3+r*.055), {rev:.15}); } }
+  function boom(E, t, v){ E.hit("kit","kick", t, v); E.hit("kit","kick", t+2*E.B, v*.85); }
+  SONGS2.highlands = {name:"Highlands", bpm:84, opt:{verb:4, wet:.5, seed:23}, bed:["air", .012],
     form:[["intro",4],["A",8],["B",8],["T",8],["calm",4]],
-    bar:function(E, t, s, b){ var B = E.B, c = P[b % 8], N = c.n;
-      if(s==="intro"){ E.strings(N.slice(0,3), t, E.BAR-.2, .35, {att:2, bright:.35}); E.inst("contrabass", c.b+12, t, E.BAR, .4, {att:.8});
-        if(b===0){ for(var r=0;r<12;r++) E.timp(c.b+24, t+r*B/4, .1+r*.03); }
-        if(b>=2) E.horn(nm("F4"), t+2*B, 2*B, .4);
-        if(b===3) E.hit("kit","snare", t+3.5*B, .25); return; }
-      if(s==="calm"){ E.strings(N, t, E.BAR-.4, .3, {att:1.8, bright:.35}); E.arp(N.concat(N.map(function(x){ return x+12; })), t, 4, .5, function(m, at){ E.harp(m, E.hum(at), .32); }, [0,1,2,3,4,5,6,7]);
-        if(b===1||b===3) E.inst("oboe", N[3], t+B, 2*B, .3, {att:.12}); if(b===2) E.flute(N[3]+12, t+B, 2*B, .35); return; }
+    bar:function(E, t, s, b){ var B = E.B, c = P[b % 8], N = c.n, low = [N[0], N[1]].map(function(x){ return x > 64 ? x-12 : x; });
+      if(s==="intro"){ E.strings(N.slice(0,3), t, E.BAR-.2, .3, {att:1.5, bright:.35}); E.inst("contrabass", c.b+12, t, E.BAR, .35, {att:.6});
+        E.mel(CALL, b, t, function(m, at, d){ E.inst("trumpet", m, at, d*.92, .55, {att:.02, rel:.35, rev:.7}); });
+        if(b>=2) E.chord("horn", N.slice(1,3), t, E.BAR-.2, .35, {att:.4, rel:.8});
+        if(b===0){ for(var r=0;r<12;r++) E.timp(c.b+24, t+r*B/4, .08+r*.03); }
+        if(b>=1) cadence(E, t, .22 + b*.02, b===3); if(b===3) E.timp(c.b+24, t+3.5*B, .5); return; }
+      if(s==="calm"){ E.strings(N, t, E.BAR-.4, .3, {att:1.6, bright:.35}); E.chord("horn", N.slice(1), t, E.BAR-.3, .3, {att:.8, rel:1.4});
+        E.inst("tuba", c.b+12, t, E.BAR-.3, .25, {att:.3, rel:.8});
+        E.mel(CALL, b, t, function(m, at, d){ E.inst("trumpet", m, at, d*.9, .22, {att:.03, rel:.5, rev:.95, del:.3}); });
+        E.hit("kit","snare", t, .12, {rev:.4}); if(b===3) for(var q=0;q<16;q++) E.hit("kit","snare", t+2*B+q*B/8, .06+q*.012, {rev:.3}); return; }
       var full = s==="T";
-      E.strings(N, t, E.BAR-.25, full ? .75 : s==="B" ? .55 : .45, {att: full ? .5 : 1, bright: full ? .85 : .5});
-      E.inst("contrabass", c.b+12, t, E.BAR-.2, full ? .55 : .45, {att:.3});
-      E.inst("tuba", c.b+12, t, E.BAR-.3, full ? .45 : .3, {att:.15, rel:.6});
-      E.chord("trombone", [N[0], N[1]].map(function(x){ return x > 64 ? x-12 : x; }), t, E.BAR-.3, full ? .4 : .28, {att:.15, rel:.6});
-      if(s==="A"){ E.mel(MA, b, t, function(m, at, d){ E.horn(m, at, d, .6); }); if(b%2===1) E.hit("kit","snare", t+3.5*B, .18); }
-      if(s==="B"){ E.mel(MB, b, t, function(m, at, d){ E.strings([m, m-12], at, Math.max(.4,d-.1), .55, {att:.25, rel:1, bright:.8}); });
-        E.chord("choir", N.slice(1).map(function(x){ return x+12 > 81 ? x : x+12; }), t, E.BAR-.4, .3, {att:1, rel:1.6});
-        E.mel(CO, b, t, function(m, at, d){ E.horn(m+12, at, d, .4); }); }
-      if(full){ E.mel(MA, b, t, function(m, at, d){ E.inst("trumpet", m, at, d, .45, {att:.06, rel:.5}); E.horn(m-12, at, d, .55); E.strings([m+12], at, Math.max(.4,d-.1), .4, {att:.15, rel:.8, bright:.9}); });
-        E.timp(c.b+24, t, .6); if(b%2===1) E.timp(c.b+31, t+2*B, .45);
-        E.hit("kit","snare", t+3*B, .22); E.hit("kit","snare", t+3.5*B, .3); if(b%4===3) for(var q=0;q<8;q++) E.hit("kit","snare", t+2*B+q*B/4, .12+q*.03);
-        if(b===0) E.hit("kit","crash", t, .45, {rev:.8}); E.chord("choir", N.slice(1), t, E.BAR-.4, .35, {att:.8, rel:1.4}); }
+      E.strings(N, t, E.BAR-.25, full ? .6 : .4, {att: full ? .4 : .8, bright: full ? .8 : .5});
+      E.inst("contrabass", c.b+12, t, E.BAR-.2, full ? .45 : .38, {att:.2});
+      /* oom-pah: tuba on 1 and 3, trombones on 2 and 4 */
+      E.inst("tuba", c.b+12, t, B*.8, full ? .55 : .45, {att:.03, rel:.2}); E.inst("tuba", c.b+19, t+2*B, B*.8, full ? .48 : .4, {att:.03, rel:.2});
+      E.chord("trombone", low, t+B, B*.5, full ? .45 : .35, {att:.02, rel:.2}); E.chord("trombone", low, t+3*B, B*.5, full ? .45 : .35, {att:.02, rel:.2});
+      boom(E, t, full ? .7 : .55);
+      cadence(E, t, full ? .4 : s==="B" ? .26 : .32, b===7 || (full && b===3));
+      if(s==="A"){ E.mel(MA, b, t, function(m, at, d){ E.inst("trumpet", m, at, d*.9, .55, {att:.02, rel:.3}); });
+        E.mel(CO, b, t, function(m, at, d){ E.horn(m+12, at, d, .38); }); }
+      if(s==="B"){ E.mel(MB, b, t, function(m, at, d){ E.strings([m, m-12], at, Math.max(.4,d-.1), .5, {att:.2, rel:.9, bright:.8}); E.horn(m-12, at, d, .45); });
+        E.chord("choir", N.slice(1).map(function(x){ return x+12 > 81 ? x : x+12; }), t, E.BAR-.4, .28, {att:1, rel:1.6});
+        if(b%2===1) E.chord("trumpet", N.slice(1).map(function(x){ return x+12 > 82 ? x : x+12; }), t+3.5*B, B*.35, .45, {att:.01, rel:.15}); }
+      if(full){ E.mel(MA, b, t, function(m, at, d){ E.inst("trumpet", m, at, d*.9, .6, {att:.02, rel:.3}); E.inst("trumpet", m-12, at, d*.9, .35, {att:.02, rel:.3}); E.horn(m-12, at, d, .5); E.strings([m+12], at, Math.max(.4,d-.1), .35, {att:.12, rel:.7, bright:.9}); });
+        E.timp(c.b+24, t, .6); E.timp(c.b+31, t+2*B, .45);
+        if(b%4===0) E.hit("kit","crash", t, .45, {rev:.6}); E.chord("choir", N.slice(1), t, E.BAR-.4, .32, {att:.8, rel:1.4});
+        if(b===7){ var st = N.slice(1).map(function(x){ return x+12 > 82 ? x : x+12; }); [2, 2+1/3, 2+2/3, 3].forEach(function(p, k){ E.chord("trumpet", st, t+p*B, k===3 ? B*.9 : B*.25, .5, {att:.01, rel:.2}); }); } }
       if(s==="B" && b===7){ for(var r2=0;r2<12;r2++) E.timp(c.b+24, t+B+r2*B/4, .1+r2*.05); }
     }};
 })();
 
-/* Study Hall: a warm lo-fi beat for homework. 76 BPM with swing. Electric piano, upright bass, a dusty drum kit, nylon guitar and vibes. */
+/* Study Hall: a warm lo-fi beat for homework. 76 BPM with swing. Electric piano, upright bass, a dusty drum kit and vibes. */
 (function(){
   var P = prog(["F2/A3 E4 G4 C5","E2/D4 G4 B4","D2/F3 C4 E4 A4","C2/B3 D4 E4 G4","Bb1/A3 D4 F4","A1/G3 C4 E4","D2/F3 C4 E4 A4","G1/F3 C4 D4 G4"]);
   var M = seq("E5:1.5 D5:.5 C5:1 A4:1 | B4:2 r:2 | A4:1 F5:1 E5:1 C5:1 | D5:2 r:2 | D5:1.5 C5:.5 Bb4:1 F4:1 | E4:2 G4:2 | A4:1 C5:1 F5:1 E5:1 | D5:4");
@@ -1597,7 +1612,7 @@ function pickOne(E, arr){ return arr[Math.floor(E.r()*arr.length) % arr.length];
       var cv = s==="intro"||s==="break" ? .38 : .5;
       E.chord("epiano", N, E.hum(t), 1.5*B, cv, {spread:.012, rel:.4});
       if(s!=="intro") E.chord("epiano", N.slice(1), E.hum(sw(3)), 1.1*B, cv*.7, {spread:.01, rel:.3});
-      if(s==="break"){ if(b===3) E.inst("vibes", N[3]+12, sw(6), null, .4); if(b%2===0) E.inst("nylon", N[N.length-1], sw(5), null, .35); return; }
+      if(s==="break"){ if(b===3) E.inst("vibes", N[3]+12, sw(6), null, .4); if(b%2===0) E.inst("vibes", N[N.length-1], sw(5), null, .3); return; }
       if(s==="intro"){ if(b>=2) E.hit("lofi","hhc", t+3*B, .3); return; }
       // upright bass: root, a pickup to the fifth, and a passing note into the next chord
       var nx = P[(b+1) % 8].b;
@@ -1608,29 +1623,41 @@ function pickOne(E, arr){ return arr[Math.floor(E.r()*arr.length) % arr.length];
       E.hit("lofi","xstick", t+B, .55); E.hit("lofi","snare", t+3*B, .35); E.hit("lofi","xstick", t+3*B, .3);
       for(var e=0;e<8;e++) E.hit("lofi", e===7 && b%4===3 ? "hho" : "hhc", sw(e), e%2 ? .3 : .45);
       if(s==="B") E.mel(M, b, t, function(m, at, d){ E.inst("vibes", m, E.hum(at), null, .45); });
-      if(s==="A" && b%4===1) E.arp([N[N.length-1], N[N.length-2], N[1]].map(function(x){ return x+12; }), t+2*B, 2, .5, function(m, at){ E.inst("nylon", m-12, E.hum(sw(4+Math.round((at-t-2*B)/(B/2)))), null, .32); });
+      if(s==="A" && b%4===1) E.arp([N[N.length-1], N[N.length-2], N[1]].map(function(x){ return x+12; }), t+2*B, 2, .5, function(m, at){ E.inst("epiano", m, E.hum(sw(4+Math.round((at-t-2*B)/(B/2)))), .45*B, .3, {att:.005, rel:.3}); });
     }};
 })();
 
-/* Nebula: drifting past a gas giant. C lydian, 84 BPM. Halo pads, a pulsing synth bass, celesta and music box stars, a choir, and a lead that lifts over a pedal. */
+/* Nebula: drifting past a gas giant, with the clock running. A minor, 76 BPM. A church organ ostinato that builds bar by bar, a ticking clock, high piano, cello swells, tremolo strings and choir, and a full organ climax. */
 (function(){
-  var P = prog(["C2/E3 B3 F#4 G4","A1/C4 E4 G4 B4","F2/A3 E4 G4 B4","C2/D4 F#4 A4","E2/D4 G4 B4","C2/D4 E4 G4 B4","C2/F3 Ab3 D4","G1/A3 B3 E4"]);
-  var M = seq("B4:2 C5:1 D5:1 | E5:3 F#5:1 | G5:2 E5:2 | F#5:4 | E5:1 F#5:1 G5:1 B5:1 | A5:3 G5:1 | Ab5:2 F5:1 D5:1 | D5:4");
-  SONGS2.nebula = {name:"Nebula", bpm:84, opt:{verb:5.5, wet:.7, seed:42}, bed:["air", .02],
+  var P = prog(["A1/A3 C4 E4 B4","F1/A3 C4 E4 G4","C2/G3 C4 E4 G4","G1/G3 B3 D4 E4","A1/A3 C4 E4 A4","F1/F3 A3 C4 E4","D2/F3 A3 D4 E4","E1/G#3 B3 D4 E4"]);
+  var M = seq("E5:4 | E5:2 G5:2 | G5:3 E5:1 | D5:4 | C5:4 | C5:2 E5:2 | F5:3 E5:1 | E5:4");
+  var HI = [nm("E6"), nm("E6"), nm("E6"), nm("D6"), nm("E6"), nm("C6"), nm("D6"), nm("B5")];
+  SONGS2.nebula = {name:"Nebula", bpm:76, opt:{verb:6, wet:.65, seed:42}, bed:["air", .018],
     form:[["intro",4],["A",8],["B",8],["C",8],["drift",4]],
-    bar:function(E, t, s, b){ var B = E.B, c = P[b % 8], N = c.n, up = N.concat(N.map(function(x){ return x+12; }));
-      E.chord("halo_pad", N, t, E.BAR-.3, s==="C" ? .5 : .4, {att:1.6, rel:3});
-      E.inst("synth_bass", c.b+12, t, E.BAR*.9, s==="intro"||s==="drift" ? .25 : .35, {att:.4, rel:1});
-      if(s==="intro"||s==="drift"){ if(b%2===0) E.inst("music_box", N[N.length-1]+12, t+B, null, .35); if(b===3) E.chord("sweep_pad", N.slice(1), t, E.BAR, .3, {att:2.4, rel:3});
-        if(b===1) E.inst("atmosphere", N[2]+12, t, 2*B, .3, {att:.6, rel:2}); return; }
-      E.arp(up, t, 4, .25, function(m, at, k){ E.inst("celesta", m+12 > 108 ? m : m+12, at, null, k%4===0 ? .28 : .18, {del:.35}); }, [0,2,4,1,3,5,2,6]);
-      for(var e=0;e<8;e++) E.inst("synth_bass", c.b+12, t+e*B/2, B*.3, e%2 ? .2 : .3, {att:.005, rel:.1});
-      if(s!=="A"){ E.hit("kit","kick", t, .45); E.hit("kit","kick", t+2*B, .35); if(s==="C"){ E.hit("kit","kick", t+B, .25); E.hit("kit","kick", t+3*B, .3); E.hit("kit","snare", t+B, .18, {rev:.9}); E.hit("kit","snare", t+3*B, .2, {rev:.9}); }
-        for(var h=1;h<8;h+=2) E.hit("kit","hhc", t+h*B/2, .22); }
-      if(s==="B"){ E.chord("oohs", N.slice(1), t, E.BAR-.4, .28, {att:1.2, rel:2}); if(b%2===0) E.inst("violins_trem", N[N.length-1]+12, t, E.BAR*2-.4, .15, {att:1.5, rel:2}); }
-      if(s==="C"){ E.mel(M, b, t, function(m, at, d){ E.inst("saw_lead", m, at, d*.95, .3, {att:.04, rel:.5, del:.35}); }); E.chord("choir", N.slice(1), t, E.BAR-.4, .25, {att:1, rel:1.8}); }
-      if(E.r()<.45) E.inst("music_box", pickOne(E, up)+12, t+B*Math.floor(E.r()*4), null, .25);
-      if(b===7){ E.chord("sweep_pad", N.slice(1), t, E.BAR, .3, {att:2, rel:2.5}); E.hit("kit","crash", t+3.5*B, .2, {rev:.9}); }
+    bar:function(E, t, s, b){ var B = E.B, c = P[b % 8], N = c.n, k;
+      var tick = {intro:.3, A:.26, B:.22, C:.16, drift:.3}[s];
+      for(k=0;k<4;k++) E.inst("woodblock", 79, t+k*B, null, k===0 ? tick*1.25 : tick, {rev:.25});
+      var ped = c.b+12, lvl = {intro:.22, A:.32, B:.42, C:.6, drift:.22}[s];
+      E.inst("organ", ped, t, E.BAR-.05, lvl, {att:.8, rel:1.6});
+      /* sparse high piano: one repeated note, like a signal from far away */
+      if(s!=="C") E.piano(HI[b % 8], t, .22); if(s==="intro"||s==="drift"||s==="A") E.piano(HI[b % 8], t+2*B, .16);
+      if(s==="intro"){ E.chord("organ", N.slice(0,3), t, E.BAR-.1, .22 + b*.03, {att:1.6, rel:2});
+        if(b>=2) E.cello(c.b+12, t, E.BAR, .3 + (b-2)*.08); return; }
+      if(s==="drift"){ E.chord("organ", N.slice(0,3), t, E.BAR-.1, .3 - b*.05, {att:1.2, rel:3}); if(b===0) E.cello(c.b+12, t, 2*E.BAR, .3); return; }
+      /* the ostinato: eighth notes rocking between chord tones, louder and wider as the station goes on */
+      var grow = s==="A" ? .16 + b*.018 : s==="B" ? .3 + b*.012 : .44, os = [N[1], N[3], N[2], N[3], N[1], N[3], N[2], N[3]];
+      for(var e=0;e<8;e++){ E.inst("organ", os[e], t+e*B/2, B*.48, e%2 ? grow*.85 : grow, {att:.02, rel:.25});
+        if(s==="C") E.inst("organ", os[e]+12, t+e*B/2, B*.48, grow*.55, {att:.02, rel:.25}); }
+      if(s==="A"){ if(b%2===0) E.cello(c.b+24, t, 2*E.BAR-.3, .35 + b*.03, {att:2.2, rel:2});
+        if(b>=4) E.inst("violins_trem", N[3]+12, t, E.BAR-.2, .1 + (b-4)*.03, {att:2, rel:1.8}); }
+      if(s==="B"){ E.cello(c.b+24, t, E.BAR-.2, .45, {att:1.4, rel:1.8}); E.chord("violins_trem", N.slice(1).map(function(x){ return x+12; }), t, E.BAR-.2, .22, {att:1.6, rel:1.8});
+        E.chord("oohs", N.slice(1), t, E.BAR-.4, .26, {att:1.4, rel:2}); E.inst("contrabass", c.b+12, t, E.BAR, .35, {att:1});
+        if(b===7){ for(var r=0;r<16;r++) E.timp(c.b+24 < 40 ? c.b+36 : c.b+24, t+r*B/4, .05+r*.03); } }
+      if(s==="C"){ E.chord("organ", N.concat([N[0]+12]), t, E.BAR-.05, .55, {att:.4, rel:2.2}); E.inst("organ", ped-12 < 36 ? ped : ped-12, t, E.BAR-.05, .5, {att:.5, rel:2});
+        E.mel(M, b, t, function(m, at, d){ E.chord("choir", [m, m-12], at, d*.98, .5, {att:.5, rel:1.6}); E.strings([m, m+12], at, Math.max(.5,d-.1), .5, {att:.3, rel:1.4, bright:.8}); });
+        E.chord("violins_trem", N.slice(1).map(function(x){ return x+12; }), t, E.BAR-.2, .2, {att:.8, rel:1.4}); E.inst("contrabass", c.b+12, t, E.BAR, .45, {att:.5});
+        if(b%4===0){ E.timp(c.b+24 < 40 ? c.b+36 : c.b+24, t, .55); E.hit("kit","crash", t, .25, {rev:.9}); }
+        if(b===7) E.inst("tubular", nm("E5"), t+2*B, null, .3); }
     }};
 })();
 
@@ -1835,7 +1862,7 @@ var MUS = (function(){
     hp.connect(ls); ls.connect(pk); pk.connect(hs); hs.connect(lim); lim.connect(c.destination); return hp; }
   /* every song at the same loudness (measured through the mastering chain), so switching stations never jumps */
   var TRIM = {horizon:.4, highlands:.9, studyhall:-1.1, nebula:.4, grid:2.2, clearskies:.2, lightsout:1, arcade:2.1}, trimG = null;
-  var TRIM_REAL = {horizon:-1.8, highlands:-2.1, studyhall:0, nebula:.6, grid:0, lightsout:1.4, clearskies:0, arcade:0};   // the real-instrument songs, matched to the classic levels
+  var TRIM_REAL = {horizon:-1.8, highlands:-.6, studyhall:0, nebula:1.6, grid:0, lightsout:1.4, clearskies:0, arcade:0};   // the real-instrument songs, matched to the classic levels
   function target(){ var d = Date.now() < duckUntil ? .08 : focusDuck ? .15 : 1; return st.on ? (st.vol/100)*.9*d : 0; }
   function level(fast){ if(master) master.gain.setTargetAtTime(target(), ctx.currentTime, fast ? .3 : 1.6); }
   function start(){ if(!ac()) return; var k = songKey();
@@ -2162,7 +2189,7 @@ var DISP = (function(){
 DISP.apply();
 
 /* ================= Feedback: straight to the developer's Google Form, anonymous by default ================= */
-var FPLN_VERSION = "0.10.0 beta 1 \u00b7 15 Nov 2026";
+var FPLN_VERSION = "0.10.1 beta 1 \u00b7 15 Nov 2026";
 var FB = (function(){
   var FORM = "https://docs.google.com/forms/d/e/1FAIpQLSf2YdE91QlvrLtVRfqKF-KoC-do04QxvXyvM3vY6dF4BQavlw/";
   var F_MSG = "entry.1832434695", F_NAME = "entry.1191502103", QKEY = "fpln:fbq";
