@@ -62,7 +62,7 @@ HOSTS_LINKS = {"aistudio.google.com","corp.commissaries.com","history.army.mil",
                "westpoint.edu","www.westpoint.edu","www.google.com","www.ikehall.com","www.openstreetmap.org","www.opentable.com","www.shopmyexchange.com",
                "afpln.github.io","github.com","westpoint.instructure.com","www.w3.org","console.anthropic.com","schema.org"}
 ALLOWED_HOSTS = HOSTS_DATA | HOSTS_LIBS | HOSTS_LINKS
-OK_EXT = {".html",".js",".json",".webmanifest",".png",".ico",".svg",".md",".txt",".zip",".yml",".yaml",".py",".url",".cmd",""}
+OK_EXT = {".mp3",".html",".js",".json",".webmanifest",".png",".ico",".svg",".md",".txt",".zip",".yml",".yaml",".py",".url",".cmd",""}
 BAD_EXT = {".docx",".doc",".pdf",".xlsx",".xls",".csv",".pptx",".db",".sqlite",".env",".pem",".key",".p12",".pfx",".bak",".log"}
 SKIP_DIRS = {".git"}
 SELF = os.path.abspath(__file__)

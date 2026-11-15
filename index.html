@@ -898,7 +898,8 @@ textarea:focus{border-color:var(--cy);outline:none;box-shadow:0 0 0 1px var(--cy
 .mus .st .wide{grid-column:1/-1}
 #mus{max-height:calc(100dvh - var(--nav) - 40px);overflow:auto}
 .mus .st button{background:rgba(62,240,255,.05);border:1px solid var(--line-hi);color:#bfefff;padding:9px 4px;font:600 11px/1.2 var(--f-disp);letter-spacing:.12em;text-transform:uppercase;border-radius:2px}
-.mus .st button small{display:block;font:500 10px/1.2 var(--f-body);letter-spacing:.02em;text-transform:none;color:var(--dim);margin-top:3px}
+.mus .musinst{grid-template-columns:1fr 1fr!important;margin:2px 0 4px}
+.st button small{display:block;font:500 10px/1.2 var(--f-body);letter-spacing:.02em;text-transform:none;color:var(--dim);margin-top:3px}
 .mus .st button[aria-pressed="true"]{border-color:var(--cy);color:var(--cy);background:rgba(62,240,255,.14);box-shadow:0 0 12px -4px var(--cy)}
 .mus input[type=range]{width:100%;accent-color:var(--cy)}
 .disp{width:min(380px,calc(100vw - 24px))}
@@ -963,8 +964,9 @@ textarea:focus{border-color:var(--cy);outline:none;box-shadow:0 0 0 1px var(--cy
 <div class="mus" id="mus" hidden role="dialog" aria-label="Music">
   <div class="row" style="justify-content:space-between"><span class="lbl" style="color:var(--cy);text-shadow:0 0 8px rgba(62,240,255,.5)">Cabin audio</span><button type="button" class="x" id="musX" aria-label="Close">×</button></div>
   <div class="st" id="musSt"></div>
+  <div class="st musinst" id="musInst" role="group" aria-label="Instruments"><button type="button" data-real="1" id="musReal" aria-pressed="false">Real orchestra<small>New: recorded instruments</small></button><button type="button" data-real="0" id="musSyn" aria-pressed="true">Classic<small>The original synth sound</small></button></div>
   <label class="row" style="flex-wrap:nowrap"><span class="note" style="width:56px">Volume</span><input type="range" id="musVol" min="0" max="100"></label>
-  <p class="note">Original music, made live on your device. It quiets down for minute calls, the alarm and focus sounds.</p>
+  <p class="note">Original music, made live on your device. Real orchestra uses recorded piano, strings, horn, flute and harp (VS Chamber Orchestra, free to use) and downloads about 2 to 6 MB the first time. It quiets down for minute calls, the alarm and focus sounds.</p>
 </div>
 
 <div class="ix" id="fb" hidden role="dialog" aria-modal="true" aria-labelledby="fbT">
@@ -1116,6 +1118,31 @@ function prog(arr){ return arr.map(function(x){ var p = x.split("/"); return {b:
 function mf(m){ return 440*Math.pow(2, (m-69)/12); }
 function rng(seed){ var s = seed>>>0 || 1; return function(){ s ^= s<<13; s ^= s>>>17; s ^= s<<5; return ((s>>>0) % 100000)/100000; }; }
 
+/* ---- real instruments: recorded samples from VS Chamber Orchestra Community Edition (Versilian Studios, CC0) ----
+   Loaded from FPLN's own site the first time a station needs them, then kept offline. Until they arrive (or if they
+   can't load) each instrument falls back to its synthesized version, so music never stops. */
+var SAMP = (function(){
+  var BASE = "music/", man = null, manP = null, bufs = {}, loading = {}, ready = {};
+  function manifest(){ if(!manP) manP = fetch(BASE + "samples.json").then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ man = j; return j; }, function(){ manP = null; return null; }); return manP; }
+  /* decoded at 24 kHz (the recordings carry little above 10 kHz), which halves the memory they take */
+  var dctx = null;
+  function decode(ctx, ab){ try{ if(!dctx) dctx = new (window.OfflineAudioContext||window.webkitOfflineAudioContext)(1, 1, 24000); }catch(e){ dctx = ctx; }
+    var c = dctx || ctx; return new Promise(function(res, rej){ try{ var p = c.decodeAudioData(ab, res, rej); if(p && p.then) p.then(res, rej); }catch(e){ rej(e); } }); }
+  function load(ctx, names){ return manifest().then(function(){ if(!man) return; return Promise.all(names.map(function(n){
+    if(ready[n]) return ready[n]; if(loading[n]) return loading[n]; var rows = man.inst[n] || [];
+    loading[n] = Promise.all(rows.map(function(r){ if(bufs[r.f]) return; return fetch(BASE + r.f).then(function(x){ if(!x.ok) throw new Error(x.status); return x.arrayBuffer(); }).then(function(ab){ return decode(ctx, ab); }).then(function(b){ bufs[r.f] = b; }, function(){}); }))
+      .then(function(){ var ok = rows.filter(function(r){ return bufs[r.f]; }); if(ok.length) ready[n] = ok; delete loading[n]; return ok; }, function(){ delete loading[n]; });
+    return loading[n]; })); }); }
+  /* nearest recorded note; on a tie take the one above, since pitching down sounds more natural than up */
+  function pick(n, m, layer){ var rows = ready[n]; if(!rows) return null; var L = rows;
+    if(layer){ var Lv = rows.filter(function(r){ return r.v === layer; }); if(Lv.length) L = Lv; }
+    var best = null, bd = 1e9; L.forEach(function(r){ var d = Math.abs(r.m - m) + (r.m < m ? .01 : 0); if(d < bd){ bd = d; best = r; } });
+    return best && bufs[best.f] ? {buf:bufs[best.f], m:best.m + (best.c||0)/100} : null; }
+  return {load:load, pick:pick, has:function(n){ return !!ready[n]; }, manifest:manifest};
+})();
+var USES = {piano:["piano"], strings:["violins","violas","cellos"], cello:["cellos"], horn:["horn"], flute:["flute"], harp:["harp"], bell:["glock"], timp:["timpani"], roll:["timpani"]};
+function needs(song){ var src = String(song.bar), out = {}; Object.keys(USES).forEach(function(k){ if(new RegExp("E\\." + k + "\\(").test(src)) USES[k].forEach(function(n){ out[n] = 1; }); }); return Object.keys(out); }
+
 function Engine(ctx, dest, bpm, opt){
   opt = opt || {};
   var E = {ctx:ctx, B:60/bpm, BAR:240/bpm, r:rng(opt.seed||7)}, sr = ctx.sampleRate;
@@ -1250,6 +1277,39 @@ function Engine(ctx, dest, bpm, opt){
   /* play the slice of a melody that falls in bar b of a section */
   E.mel = function(S, b, t, fn, tr){ var lo = (b*4) % S.len, hi = lo+4; S.forEach(function(x){ if(x[0]>=lo-1e-6 && x[0]<hi-1e-6) fn(x[1]+(tr||0), t+(x[0]-lo)*E.B, x[2]*E.B); }); };
   E.arp = function(notes, t, beats, step, fn, pat){ var k = 0; for(var x=0;x<beats-1e-6;x+=step){ var i = pat ? pat[k % pat.length] : k % notes.length; fn(notes[i % notes.length], t+x*E.B, k); k++; } };
+  /* ---- real instruments replace the synthesized ones note by note, as soon as their samples are loaded ---- */
+  if(opt.real){
+    var syn = {piano:E.piano, strings:E.strings, cello:E.cello, horn:E.horn, flute:E.flute, harp:E.harp, bell:E.bell, timp:E.timp};
+    var KG = {piano:.62, str:.3, cellos:.34, horn:.3, flute:.36, harp:.6, glock:.22, timpani:.6};
+    function secOf(m){ return m < 50 ? "cellos" : m < 57 ? "violas" : "violins"; }
+    /* one recorded note. dur null = let it ring (struck); otherwise hold it, crossfading fresh copies of the
+       sustain if the note outlasts the recording */
+    function sv(n, m, t, dur, vel, o){ o = o || {}; var s = SAMP.pick(n, m, o.layer); if(!s) return false;
+      var rate = Math.pow(2, (m - s.m)/12), g = ctx.createGain(), f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = Math.min(19000, o.cut || 16000); f.Q.value = .3; f.connect(g);
+      var att = o.att || .004, peak = Math.max(.0001, vel), len = s.buf.duration / rate;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + att);
+      if(dur == null){ var src = ctx.createBufferSource(); src.buffer = s.buf; src.playbackRate.value = rate; src.connect(f); src.start(t); src.stop(t + len + .05); }
+      else { var rel = o.rel || .6, endT = t + att + Math.max(.05, dur), x = .45, off = Math.min(1.2, s.buf.duration*.3), seg0 = Math.max(.6, (s.buf.duration - .7)/rate), segL = Math.max(.8, (s.buf.duration - .7 - off)/rate), tt = t, first = true, k = 0, stopAt = endT + rel*2;
+        while(tt < stopAt && k < 14){ var sr2 = ctx.createBufferSource(), sg = ctx.createGain(); sr2.buffer = s.buf; sr2.playbackRate.value = rate; sr2.connect(sg); sg.connect(f);
+          var L = first ? seg0 : segL, st0 = tt, sp = st0 + L;
+          if(!first){ sg.gain.setValueAtTime(0, st0); sg.gain.linearRampToValueAtTime(1, st0 + x); }
+          if(sp < stopAt){ sg.gain.setValueAtTime(1, sp - x); sg.gain.linearRampToValueAtTime(0, sp); }
+          sr2.start(st0, first ? 0 : off); sr2.stop(Math.min(sp, stopAt) + .05); tt = sp - x; first = false; k++; }
+        g.gain.setValueAtTime(peak, endT); g.gain.setTargetAtTime(0, endT, rel/3.5); }
+      send(g, o.rev == null ? .45 : o.rev, o.del || 0); return true; }
+    E.guitar = function(m, t, vel, o){ syn.harp(m, t, (vel||.5)*.9, Object.assign({bright:.7, decay:.55, cut:5200, rev:.35}, o||{})); };
+    E.piano = function(m, t, vel, o){ o = o||{}; var v = vel||.5;
+      if(!sv("piano", m, t, null, v*KG.piano, {layer: v < .45 ? 1 : 2, rev:o.rev == null ? .38 : o.rev, del:o.del, cut:2200 + v*13000})) syn.piano(m, t, vel, o); };
+    E.strings = function(notes, t, dur, vel, o){ o = o||{}; if(!notes.every(function(m){ return SAMP.has(secOf(m)); })) return syn.strings(notes, t, dur, vel, o);
+      var att = o.att||1.4, rel = o.rel||2.2, br = o.bright == null ? .5 : o.bright, v = (vel||.5)*KG.str/Math.sqrt(notes.length);
+      notes.forEach(function(m, i){ sv(secOf(m), m, t + (i ? E.r()*.06 : 0), dur, v, {att:att, rel:rel, rev:o.rev == null ? .5 : o.rev, del:o.del, cut:3000 + br*12000}); }); };
+    E.cello = function(m, t, dur, vel, o){ o = o||{}; if(!sv("cellos", m, t, dur, (vel||.5)*KG.cellos, {att:o.att||.5, rel:o.rel||1.6, rev:o.rev == null ? .4 : o.rev, cut:7000})) syn.cello(m, t, dur, vel, o); };
+    E.horn = function(m, t, dur, vel, o){ o = o||{}; var v = vel||.6; if(!sv("horn", m, t, dur, v*KG.horn, {att:o.att||.07, rel:o.rel||.5, rev:o.rev == null ? .6 : o.rev, cut:2600 + v*8000})) syn.horn(m, t, dur, vel, o); };
+    E.flute = function(m, t, dur, vel, o){ o = o||{}; if(!sv("flute", m, t, dur, (vel||.5)*KG.flute, {att:o.att||.06, rel:o.rel||.4, rev:o.rev == null ? .7 : o.rev, del:o.del == null ? .15 : o.del, cut:12000})) syn.flute(m, t, dur, vel, o); };
+    E.harp = function(m, t, vel, o){ o = o||{}; if(!sv("harp", m, t, null, (vel||.5)*KG.harp, {rev:o.rev == null ? .55 : o.rev, del:o.del, cut:o.cut ? o.cut*2 : 11000})) syn.harp(m, t, vel, o); };
+    E.bell = function(m, t, vel, o){ o = o||{}; if(m < 72 || !sv("glock", m, t, null, (vel||.4)*KG.glock, {rev:o.rev == null ? .75 : o.rev, del:o.del == null ? .25 : o.del, cut:15000})) syn.bell(m, t, vel, o); };
+    E.timp = function(m, t, v){ if(!sv("timpani", m, t, null, (v||.5)*KG.timpani, {rev:.45, cut:6000})) syn.timp(m, t, v); };
+  }
   return E;
 }
 
@@ -1425,9 +1485,10 @@ var SONGS = {};
 })();
 
 /* ---- player ---- */
-function Player(ctx, dest, key){
+function Player(ctx, dest, key, real){
   var song = SONGS[key] || SONGS.horizon, bus = ctx.createGain(); bus.gain.value = (song.opt && song.opt.gain) || 1; bus.connect(dest);
-  var E = Engine(ctx, bus, song.bpm, song.opt), fi = 0, b = 0, n = 0, next = ctx.currentTime + .12, err = false;
+  if(real) SAMP.load(ctx, needs(song));
+  var E = Engine(ctx, bus, song.bpm, Object.assign({}, song.opt, {real:!!real})), fi = 0, b = 0, n = 0, next = ctx.currentTime + .12, err = false;
   var bed = song.bed ? E.bed(song.bed[0], song.bed[1]) : [];
   var P = {key:key, name:song.name, bus:bus};
   P.schedule = function(until){ while(next < until){ var s = song.form[fi]; try{ song.bar(E, next, s[0], b, n); }catch(e){ if(!err){ err = true; try{ console.error("FPLN music:", key, e && e.message); }catch(x){} } }
@@ -1437,7 +1498,7 @@ function Player(ctx, dest, key){
 }
 var LIST = [["horizon","Horizon","Golden-hour flight"],["highlands","Highlands","Horns over the Hudson"],["studyhall","Study Hall","Warm lo-fi beat"],["nebula","Nebula","Deep-space drift"],
   ["grid","Grid","Neon synth night"],["clearskies","Clear Skies","Bright morning climb"],["lightsout","Lights Out","After Taps, soft rain"],["arcade","Arcade Sunrise","Gentle chiptune"]];
-return {Player:Player, songs:SONGS, list:LIST, nm:nm, seq:seq};
+return {Player:Player, songs:SONGS, list:LIST, nm:nm, seq:seq, samples:SAMP, needs:function(k){ return needs(SONGS[k] || SONGS.horizon); }};
 })();
 
 </script>
@@ -1521,7 +1582,7 @@ var MUS = (function(){
   /* one song per theme ("Match theme"), or any song by name; the engine lives in music.js */
   var THEME_SONG = {horizon:"horizon", westpoint:"highlands", contemporary:"studyhall", scifi:"nebula", cockpit:"grid", night:"lightsout", daylight:"clearskies", retro:"arcade"};
   var OLD = {cruise:"clearskies", night:"lightsout"};
-  var st = {on:false, station:"auto", vol:55}, ctx = null, master = null, player = null, timer = null, duckUntil = 0, focusDuck = false;
+  var st = {on:false, station:"auto", vol:55, real:false}, ctx = null, master = null, player = null, timer = null, duckUntil = 0, focusDuck = false;
   try{ var o = JSON.parse(localStorage.getItem("fpln:music")||"null"); if(o) st = Object.assign(st, o); }catch(e){}
   if(OLD[st.station]) st.station = OLD[st.station];
   function persist(){ try{ localStorage.setItem("fpln:music", JSON.stringify(st)); }catch(e){} }
@@ -1543,10 +1604,11 @@ var MUS = (function(){
     hp.connect(ls); ls.connect(pk); pk.connect(hs); hs.connect(lim); lim.connect(c.destination); return hp; }
   /* every song at the same loudness (measured through the mastering chain), so switching stations never jumps */
   var TRIM = {horizon:.4, highlands:.9, studyhall:-1.1, nebula:.4, grid:2.2, clearskies:.2, lightsout:1, arcade:2.1}, trimG = null;
+  var TRIM_REAL = {horizon:-1.6, highlands:-2.1, clearskies:-.6, lightsout:-2.5};   // recorded instruments sit a little louder
   function target(){ var d = Date.now() < duckUntil ? .08 : focusDuck ? .15 : 1; return st.on ? (st.vol/100)*.9*d : 0; }
   function level(fast){ if(master) master.gain.setTargetAtTime(target(), ctx.currentTime, fast ? .3 : 1.6); }
   function start(){ if(!ac()) return; var k = songKey();
-    if(!player || player.key!==k){ if(player) player.stop(); if(trimG) try{ trimG.disconnect(); }catch(e){} trimG = ctx.createGain(); trimG.gain.value = Math.pow(10, (TRIM[k]||0)/20); trimG.connect(master); player = FPLNMusic.Player(ctx, trimG, k); }
+    if(!player || player.key!==k || player.real!==st.real){ if(player) player.stop(); if(trimG) try{ trimG.disconnect(); }catch(e){} trimG = ctx.createGain(); trimG.gain.value = Math.pow(10, ((TRIM[k]||0) + (st.real ? (TRIM_REAL[k]||0) : 0))/20); trimG.connect(master); player = FPLNMusic.Player(ctx, trimG, k, st.real); player.real = st.real; }
     if(!timer) timer = setInterval(function(){ if(player) player.schedule(ctx.currentTime+1.6); }, 250);
     player.schedule(ctx.currentTime+1.6); level(); }
   function stop(){ if(master) level(true); setTimeout(function(){ if(!st.on && player){ player.stop(); player = null; clearInterval(timer); timer = null; } }, 2200); }
@@ -1556,10 +1618,11 @@ var MUS = (function(){
   function paint(){
     var list = [["auto","Match theme",songName(songKeyAuto())+", picked by your theme"]].concat(window.FPLNMusic ? FPLNMusic.list : []);
     $("musSt").innerHTML = list.map(function(x){ return '<button type="button" data-stn="'+x[0]+'" aria-pressed="'+(st.on && st.station===x[0])+'"'+(x[0]==="auto" ? ' class="wide"' : '')+'>'+x[1]+'<small>'+x[2]+'</small></button>'; }).join("");
-    $("musVol").value = st.vol;
+    $("musVol").value = st.vol; $("musReal").setAttribute("aria-pressed", !!st.real); $("musSyn").setAttribute("aria-pressed", !st.real);
     var t = document.querySelector('[data-tool="music"]'); if(t) t.setAttribute("aria-current", st.on ? "page" : "false");
   }
   $("musSt").addEventListener("click", function(e){ var b = e.target.closest("[data-stn]"); if(!b) return; var k = b.dataset.stn; if(st.on && st.station===k) st.on = false; else { st.on = true; st.station = k; } persist(); sync(); });
+  $("musInst").addEventListener("click", function(e){ var b = e.target.closest("[data-real]"); if(!b) return; st.real = b.dataset.real === "1"; persist(); if(st.on) start(); paint(); });
   $("musVol").addEventListener("input", function(e){ st.vol = +e.target.value; persist(); level(true); });
   setTimeout(paint, 0);
   return {
@@ -1868,7 +1931,7 @@ var DISP = (function(){
 DISP.apply();
 
 /* ================= Feedback: straight to the developer's Google Form, anonymous by default ================= */
-var FPLN_VERSION = "0.9.1 beta 1 \u00b7 14 Nov 2026";
+var FPLN_VERSION = "0.9.2 beta 1 \u00b7 15 Nov 2026";
 var FB = (function(){
   var FORM = "https://docs.google.com/forms/d/e/1FAIpQLSf2YdE91QlvrLtVRfqKF-KoC-do04QxvXyvM3vY6dF4BQavlw/";
   var F_MSG = "entry.1832434695", F_NAME = "entry.1191502103", QKEY = "fpln:fbq";

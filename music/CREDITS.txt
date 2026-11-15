@@ -1,0 +1,9 @@
+FPLN "Real orchestra" instruments
+
+Samples from VS Chamber Orchestra: Community Edition by Versilian Studios
+(recorded by Sam Gossner and Simon Dalzell; sample cutting by Elan Hickler / Soundemote),
+released under CC0 1.0 Universal. https://github.com/sgossner/VSCO-2-CE
+
+Upright Piano sampled by Simon Dalzell of Ivy Audio. Redistribution granted by Versilian Studios LLC.
+
+FPLN trimmed, leveled and re-encoded the notes it uses (mono MP3). Thank you to everyone who made these free.
