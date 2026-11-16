@@ -1844,7 +1844,7 @@ window.FPLN_MODS = (function(){
     shell:{opord:'[data-nav="opord"]', brief:'[data-nav="brief"]', map:'[data-nav="map"],#vMap', canvas:'[data-tool="canvas"]', music:'[data-tool="music"],#mus'},
     home:{canvas:"#abCanvas", music:"#abMusic", quote:"#qotd", alerts:"#armPanel,.dgrid", uniform:".uod", avatar:"#lookPick,[data-editcadet]",
       scene:"#modeChip,.bezel,.viewbar,.cap,details.prev"},
-    clock:{focus:"#workHead,#workWhen,#workBox,#pomoChip", eric:"#erForm,#erPanel"}
+    clock:{focus:"#workHead,#workWhen,#workBox,#pomoChip", eric:"#erForm"}
   };
   function rules(page){ var R = CSS[page] || {}; return Object.keys(R).map(function(k){ return R[k].split(",").map(function(s){ return "html.nomod-"+k+" "+s.trim(); }).join(",")+"{display:none!important}"; }).join("\n"); }
   function paintDoc(d, page){ if(!d || !d.documentElement) return;
