@@ -33,7 +33,7 @@ ol{color:#9fb2c6;padding-left:20px;margin:26px 0 0}li{margin:0 0 6px}
 <div class="stage" id="banner">@@BLOCK@@</div>
 <div class="row"><button class="pri" id="cp">Copy banner</button><button class="gh" id="code">Copy HTML code</button></div>
 <div id="msg" role="status" aria-live="polite"></div>
-<ol><li>Paste it at the top or bottom of your email; it sizes itself to fit phones and laptops.</li><li>If someone's email hides pictures, the gold button and links still show.</li><li>Copy HTML code is for email signatures and newsletter tools that take HTML.</li></ol>
+<ol><li>Paste it at the top or bottom of your email; it sizes itself to fit phones and laptops.</li><li>If someone's email hides pictures, the gold button and links still show.</li><li>Copy HTML code is for email signatures and newsletter tools that take HTML.</li><li>While you're writing the email, Gmail and Outlook show a small “Go to link” box when you click a link instead of opening it. That's normal; the people you send it to can click straight through.</li></ol>
 </div>
 <script>
 (function(){
