@@ -64,7 +64,7 @@ Everything for FPLN in one place.
    FPLN (web link) ............. opens FPLN in your browser
 
 2 Share\\
-   FPLN-reveal.jpg ............. the cinematic reveal poster (what the email banner shows)
+   FPLN-reveal.jpg ............. the flight-deck reveal poster (what the email banner shows)
    banner.png .................. the FPLN picture to text or post
    email-picture.png ........... the picture used in the email banner
    badge.png, badge-gold.png ... install badges
