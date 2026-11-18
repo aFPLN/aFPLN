@@ -1,22 +1,18 @@
 {
   "v": 1,
-  "rev": "banner-20261111-015145",
+  "rev": "clear-banner-20261118-015042",
   "kill": {
     "state": "none",
     "id": "R-20261102-043736",
     "msg": ""
   },
   "off": [],
-  "banner": {
-    "id": "B-20261111-015145",
-    "text": "Update Chrome today: there's a security bug attackers are using right now. Restart the browser after updating.",
-    "level": "warn"
-  },
-  "updated": "2026-11-11T01:51:45+00:00",
+  "banner": null,
+  "updated": "2026-11-18T01:50:42+00:00",
   "by": "autosecure",
   "autosecure": {
     "device": true
   },
   "at_off": 1794275967731,
-  "at_banner": 1794361905792
+  "at_banner": 1794966642032
 }

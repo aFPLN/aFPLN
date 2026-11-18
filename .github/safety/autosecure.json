@@ -3,10 +3,7 @@
   "enabled": true,
   "device": true,
   "applied": {},
-  "banner": {
-    "text": "Update Chrome today: there's a security bug attackers are using right now. Restart the browser after updating.",
-    "at": 1794361905792
-  },
+  "banner": null,
   "overridden": {},
   "history": [
     {
@@ -140,14 +137,16 @@
     {
       "at": "2026-11-11T01:51:45+00:00",
       "what": "browser advisory banner: Chrome"
+    },
+    {
+      "at": "2026-11-18T01:50:42+00:00",
+      "what": "browser advisory banner removed"
     }
   ],
-  "checked": "2026-11-11T01:51:45+00:00",
+  "checked": "2026-11-18T01:50:42+00:00",
   "last": {
     "failures": {},
-    "advisory": [
-      "Chrome"
-    ],
+    "advisory": [],
     "unmapped": []
   }
 }
