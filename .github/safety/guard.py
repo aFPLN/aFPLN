@@ -62,7 +62,7 @@ HOSTS_LINKS = {"aistudio.google.com","corp.commissaries.com","history.army.mil",
                "westpoint.edu","www.westpoint.edu","www.google.com","www.ikehall.com","www.openstreetmap.org","www.opentable.com","www.shopmyexchange.com",
                "afpln.github.io","github.com","westpoint.instructure.com","www.w3.org","console.anthropic.com","schema.org"}
 ALLOWED_HOSTS = HOSTS_DATA | HOSTS_LIBS | HOSTS_LINKS
-OK_EXT = {".mp3",".html",".js",".json",".webmanifest",".png",".ico",".svg",".md",".txt",".zip",".yml",".yaml",".py",".url",".cmd",""}
+OK_EXT = {".mp3",".jpg",".html",".js",".json",".webmanifest",".png",".ico",".svg",".md",".txt",".zip",".yml",".yaml",".py",".url",".cmd",""}
 BAD_EXT = {".docx",".doc",".pdf",".xlsx",".xls",".csv",".pptx",".db",".sqlite",".env",".pem",".key",".p12",".pfx",".bak",".log"}
 SKIP_DIRS = {".git"}
 SELF = os.path.abspath(__file__)
@@ -114,6 +114,11 @@ def scan_file(path, rel):
     ext = os.path.splitext(path)[1].lower()
     if ext in BAD_EXT: add("FILE: document or data file on the public site", rel, ext); return
     if ext not in OK_EXT: add("FILE: unexpected file type", rel, ext or "(none)")
+    if ext == ".jpg":
+        try:
+            head = open(path, "rb").read(65536)
+            if b"Exif\x00\x00" in head: add("FILE: photo carries hidden EXIF data (camera, place, time)", rel, "strip it before publishing")
+        except Exception: pass
     if ext == ".zip":
         try:
             with zipfile.ZipFile(path) as z:
