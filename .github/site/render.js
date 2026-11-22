@@ -97,6 +97,8 @@ var FPLNSITE = (function(){
     root.textContent = "";
     var nv = spec.nav || {}, nav = el("nav", "wrap topnav"); nav.id = "top"; var lg = el("img"); lg.src = IMGMAP["@logo"] || (base || "")+"../icons/icon-192.png"; lg.alt = ""; nav.appendChild(lg);
     nav.appendChild(k(el("b", "", str(nv.brand || "FPLN", 24)), "nav", "brand")); if(nv.chip) nav.appendChild(k(el("span", "chip", str(nv.chip, 20)), "nav", "chip")); nav.appendChild(el("span", "sp"));
+    if(Array.isArray(nv.pages)) nv.pages.slice(0, 12).forEach(function(pg){ var a = el("a", "l pg" + (pg.cur ? " cur" : ""), str(pg.label, 24)); a.href = String(pg.href || "#");
+      if(pg.cur) a.setAttribute("aria-current", "page"); if(ED) a.setAttribute("data-page", String(pg.slug || "")); nav.appendChild(a); });
     var main = el("main");
     spec.blocks.slice(0, 60).forEach(function(b, i){ if(!b || TYPES.indexOf(b.type) < 0) return; var bid = String(b.id || ("b"+i)).replace(/[^\w-]/g, "").slice(0, 24);
       var sec = el("section", "blk bt-"+b.type+" pad-"+pick(b.pad, ["s","m","l","none"], b.type === "spacer" || b.type === "divider" ? "none" : "m")+" bg-"+(/^#/.test(b.bg || "") ? "custom" : pick(b.bg, ["none","panel","tint","gold"], "none"))+" al-"+pick(b.align, ["left","center"], "left")+(b.hidePhone ? " hide-p" : "")+(b.hideLaptop ? " hide-l" : ""));
@@ -124,5 +126,17 @@ var FPLNSITE = (function(){
     {t:"Windows download", d:"A small folder with an installer shortcut, plus the keep-awake helper for overnight alarms on a laptop.", action:"zip", label:"Download (.zip)"},
     {t:"iPhone and Android", d:"iPhone: open this page in Safari, tap Share › Add to Home Screen. Android: tap Install FPLN above, or Chrome's ⋮ › Install app.", action:"none", label:""},
     {t:"Just the browser", d:"No install at all. Bookmark it; everything works, and your data stays in that browser.", action:"app", label:"Open FPLN"}]}; }
-  return {render:render, fromV1:fromV1, FONTS:FONTS, ICONS:Object.keys(ICONS), ICONSRC:ICONS, TYPES:TYPES, IMG:IMG};
+  /* site.json v3: one look and top bar, several pages. pageOf() gives one page as a v2 spec with the page links in its top bar.
+     The first page is the install page (download/); the others live at pages/<slug>/. base is "" for download/, "../" for pages/<slug>/. */
+  function slugOk(s){ return s === "" || /^[a-z0-9](?:[a-z0-9-]{0,28}[a-z0-9])?$/.test(String(s)); }
+  function hrefOf(slug, base){ return (base || "") + (slug ? "../pages/" + slug + "/" : "../download/"); }
+  function pageOf(site, slug, base){ if(!site) return null; if(site.v === 2) return site; if(site.v !== 3 || !Array.isArray(site.pages) || !site.pages.length) return null;
+    var pages = site.pages.filter(function(p){ return p && slugOk(p.slug) && Array.isArray(p.blocks); }).slice(0, 12); if(!pages.length) return null;
+    var p = pages.filter(function(x){ return x.slug === slug; })[0] || pages[0], nav = Object.assign({}, site.nav || {});
+    var links = pages.filter(function(x){ return x.inNav !== false; }); 
+    nav.pages = links.length > 1 ? links.map(function(x){ return {slug:x.slug, label:x.label || (x.slug ? x.slug : "Home"), href:hrefOf(x.slug, base), cur:x === p}; }) : undefined;
+    return {v:2, title:p.title || site.title || "FPLN", theme:site.theme || {}, nav:nav, blocks:p.blocks}; }
+  function toV3(spec){ if(spec && spec.v === 3) return spec; if(spec && spec.v !== 2) spec = fromV1(spec);
+    return {v:3, title:spec.title || "", theme:spec.theme || {}, nav:spec.nav || {}, pages:[{slug:"", label:"Home", title:spec.title || "", blocks:spec.blocks || []}]}; }
+  return {render:render, fromV1:fromV1, pageOf:pageOf, toV3:toV3, slugOk:slugOk, FONTS:FONTS, ICONS:Object.keys(ICONS), ICONSRC:ICONS, TYPES:TYPES, IMG:IMG};
 })();

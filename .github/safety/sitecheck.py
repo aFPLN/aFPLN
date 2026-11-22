@@ -1,12 +1,43 @@
 """Checks site.json (written by the FPLN Command Center launch-site editor) before it goes live.
 Only plain text and colors are allowed: no links, no code, no personal data patterns."""
-import json, re, sys
+import json, os, re, sys
 p = sys.argv[1] if len(sys.argv) > 1 else "site.json"
 raw = open(p, encoding="utf-8").read()
 bad = []
 MARKS = re.compile(r"\b(" + "|".join(["FRAG" + "ORD", "OP" + "ORD\\s+\\d", "C" + "UI//", "FO" + "UO"]) + r")\b")
 try: c = json.loads(raw)
 except Exception as e: print("FAIL: site.json is not valid JSON:", e); sys.exit(1)
+V3 = isinstance(c, dict) and c.get("v") == 3
+if V3:
+    # site.json v3 (FPLN Studio): the v2 checks below, once per page, plus the page list itself
+    pages = c.get("pages")
+    if not isinstance(pages, list) or not pages: print("FAIL: site.json was not published:\n - pages must be a list"); sys.exit(1)
+    pbad, seen = [], set()
+    if len(pages) > 12: pbad.append("more than 12 pages")
+    for i, pg in enumerate(pages):
+        if not isinstance(pg, dict): pbad.append("pages[%d] is not a page" % i); continue
+        for k in pg:
+            if k not in {"slug", "label", "title", "blocks", "inNav"}: pbad.append("pages[%d]: unknown setting %s" % (i, k))
+        sl = pg.get("slug")
+        if i == 0 and sl != "": pbad.append("the first page is the install page and must have an empty address")
+        if i > 0 and not (isinstance(sl, str) and re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,28}[a-z0-9])?", sl)): pbad.append("pages[%d] address must be lowercase letters, digits and dashes" % i)
+        if sl in seen: pbad.append("two pages share the address %r" % sl)
+        seen.add(sl)
+        if "inNav" in pg and not isinstance(pg["inNav"], bool): pbad.append("pages[%d].inNav must be true or false" % i)
+        for k in ("label", "title"):
+            if k in pg and not (isinstance(pg[k], str) and len(pg[k]) <= (24 if k == "label" else 80)): pbad.append("pages[%d].%s is too long" % (i, k))
+    if pbad: print("FAIL: site.json was not published:"); [print(" -", b) for b in pbad]; sys.exit(1)
+    import subprocess, tempfile
+    total = 0
+    for i, pg in enumerate(pages):
+        one = {"v": 2, "title": pg.get("title") or c.get("title") or "", "theme": c.get("theme") or {}, "nav": c.get("nav") or {}, "blocks": pg.get("blocks")}
+        for k in c:
+            if k not in {"v", "title", "theme", "nav", "pages"}: print("FAIL: site.json was not published:\n - unknown setting: %s" % k); sys.exit(1)
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f: json.dump(one, f); tmp = f.name
+        r = subprocess.run([sys.executable, os.path.abspath(__file__), tmp], capture_output=True, text=True)
+        if r.returncode: print("FAIL: page %r was not published:" % (pg.get("label") or pg.get("slug") or "Home")); print("\n".join(r.stdout.splitlines()[1:])); sys.exit(1)
+    if len(raw) > 6000000: print("FAIL: site.json is too large (over 6 MB)"); sys.exit(1)
+    print("PASS: site.json (%d pages) is plain text, colors, allowed fonts and checked pictures only." % len(pages)); sys.exit(0)
 V2 = isinstance(c, dict) and c.get("v") == 2
 if len(raw) > (2600000 if V2 else 40000): bad.append("file is too large")
 if V2:

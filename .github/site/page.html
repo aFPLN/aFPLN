@@ -30,6 +30,8 @@ html[data-sky="off"] .sky{display:none}
 .topnav .sp{flex:1}
 .topnav a.l{white-space:nowrap;color:var(--dim);text-decoration:none;font:600 13px/1 var(--fd);letter-spacing:.14em;text-transform:uppercase;padding:10px 12px;border-radius:9px}
 .topnav a.l:hover{color:var(--fg);background:rgba(255,255,255,.06)}
+.topnav a.l.cur{color:var(--gold);box-shadow:inset 0 -2px 0 var(--gold)}
+@media (max-width:600px){.topnav:has(a.pg){flex-wrap:wrap;row-gap:4px}.topnav:has(a.pg) .sp{flex-basis:100%;height:0}.topnav a.pg{padding:8px 8px}}
 /* block frame */
 .blk{position:relative}
 .pad-s{padding:24px 0}.pad-m{padding:56px 0}.pad-l{padding:96px 0}.pad-none{padding:0}
@@ -112,7 +114,7 @@ details p{margin:0 0 16px;color:color-mix(in srgb,var(--fg) 82%,transparent);max
 html,body{overflow-x:hidden}@supports (overflow:clip){html,body{overflow-x:clip}}
 @media (max-width:600px){.fr-laptop::after{left:-3%;right:-3%}.shots .fr-phone{right:0}}
 /*CSS-END*/
-</style></head><body class="wait">
+</style></head><body class="wait" data-page="" data-base="">
 <div class="sky" aria-hidden="true"><div class="ridge"></div><div class="ground"></div><div class="grid"></div></div>
 <div id="page"></div>
 <noscript><p style="padding:40px 24px">FPLN needs JavaScript to install. <a href="../">Open FPLN in the browser</a>.</p></noscript>
@@ -121,14 +123,18 @@ html,body{overflow-x:hidden}@supports (overflow:clip){html,body{overflow-x:clip}
 /*SPEC-BEGIN*/var FPLN_DEFAULT_SPEC = {};/*SPEC-END*/
 /* boot: draw the built-in page at once, then the published site.json; the install buttons know each device */
 (function(){
-  var page = document.getElementById("page"), shown = false, cur = null;
+  var page = document.getElementById("page"), shown = false, cur = null, SLUG = document.body.getAttribute("data-page") || "", BASE = document.body.getAttribute("data-base") || "";
+  /* same-page links scroll here (extra pages use <base href="../../download/">, so a bare #link would jump to the install page) */
+  document.addEventListener("click", function(e){ var a = e.target.closest && e.target.closest('a[href^="#"]'); if(!a) return; var id = a.getAttribute("href").slice(1), t = id && document.getElementById(id);
+    if(t){ e.preventDefault(); t.scrollIntoView({behavior:"smooth", block:"start"}); history.replaceState(null, "", location.pathname + location.search + "#" + id); } });
+  function one(j){ return j && j.v === 3 ? FPLNSITE.pageOf(j, SLUG, BASE) : j && j.v === 2 ? j : j ? FPLNSITE.fromV1(j) : null; }
   function draw(spec){ if(!FPLNSITE.render(spec, page, {keepTitle: false})) return false; cur = spec; wire(); document.body.classList.remove("wait"); shown = true; return true; }
-  window.FPLN_SITE_APPLY = function(spec){ if(spec && spec.v !== 2) spec = FPLNSITE.fromV1(spec); draw(spec); };
+  window.FPLN_SITE_APPLY = function(spec){ spec = one(spec); if(spec) draw(spec); };
   var preview = /[?&]preview=1/.test(location.search);
   if(preview){ draw(FPLN_DEFAULT_SPEC); }
   else {
     setTimeout(function(){ if(!shown) draw(FPLN_DEFAULT_SPEC); }, 900);
-    fetch("../site.json", {cache:"no-store"}).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ window.FPLN_SITE_APPLY(j && (j.v === 2 ? j : FPLNSITE.fromV1(j)) || FPLN_DEFAULT_SPEC); }, function(){ draw(FPLN_DEFAULT_SPEC); });
+    fetch(BASE + "../site.json", {cache:"no-store"}).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ var s = one(j); draw(s || FPLN_DEFAULT_SPEC); }, function(){ draw(FPLN_DEFAULT_SPEC); });
   }
   /* ---------- install buttons ---------- */
   var bip = null, installedNow = false;

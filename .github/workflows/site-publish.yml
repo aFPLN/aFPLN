@@ -1,9 +1,10 @@
 name: FPLN launch site publish
-# When site.json changes on main (from the Command Center launch-site editor), check it and put it live.
+# When site.json or content.json changes on main (FPLN Studio, after the owner approves), check them, rebuild the
+# website pages and put everything live on gh-pages.
 on:
   push:
     branches: [main]
-    paths: [site.json]
+    paths: [site.json, content.json]
   workflow_dispatch:
 permissions:
   contents: write
@@ -19,9 +20,21 @@ jobs:
           fetch-depth: 0
       - name: Check site.json
         run: python3 .github/safety/sitecheck.py site.json
+      - name: Check content.json
+        run: python3 .github/safety/contentcheck.py content.json
+      - name: Build the website pages
+        run: python3 .github/site/build.py
       - name: Safety scan
         run: python3 .github/safety/guard.py --root .
+      - name: Commit the built pages if they changed
+        run: |
+          git add -A download/index.html
+          git add -A pages 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git -c user.name="FPLN site" -c user.email="fpln-site@users.noreply.github.com" commit -m "FPLN site: rebuild pages"
+            git push origin HEAD:main
+          fi
       - name: Publish
         run: git push -f origin HEAD:gh-pages
       - name: Summary
-        run: echo "### FPLN launch site updated from the Command Center. Live in about a minute." >> "$GITHUB_STEP_SUMMARY"
+        run: echo "### FPLN website and team content updated. Live in about a minute." >> "$GITHUB_STEP_SUMMARY"
