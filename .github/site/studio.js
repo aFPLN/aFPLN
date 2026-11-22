@@ -9,10 +9,10 @@
 var TRIG = "trig_016jugaA5GMQRmLuvupSpBBX", SITE_URL = "https://afpln.github.io/aFPLN/";
 var ME = {id:null, owner:false, name:"You"}, user = null, room = null, mcp = null;
 var HELD = {}, WANT = [], LOCKMSG = {}, PEERS = [], DIRTY = {}, SAVED = {}, lastActive = Date.now(), unsub = {};
-var APPSECS = [["notices","Announcements","bell"],["menus","Menus","list"],["officers","Officers","users"],["days","Days until","clock"],["quotes","Quotes","chat"],["uniforms","Uniforms","shield"],["links","Setup links","bolt"]];
-function emptyApp(){ return {notices:[], menus:{}, officers:{}, days:[], quotes:[], uniforms:{}}; }
-S.site = FPLNSITE.toV3(DEFAULT_SPEC); S.site.pages[0].label = "Home"; S.pageKey = ""; S.mode = "web"; S.app = emptyApp(); S.appSec = "notices"; S.tab = "sec";
-var LIVE = null, LIVEAPP = null, LIVESTAT = null, REVIEWS = [], MYREV = null;
+var APPSECS = [["layout","Layout","list"],["sections","Custom sections","star"],["notices","Announcements","bell"],["menus","Menus","list"],["officers","Officers","users"],["days","Days until","clock"],["quotes","Quotes","chat"],["uniforms","Uniforms","shield"],["links","Setup links","bolt"]];
+function emptyApp(){ return {layout:{nav:[], home:[], tiles:[]}, sections:[], notices:[], menus:{}, officers:{}, days:[], quotes:[], uniforms:{}}; }
+S.site = FPLNSITE.toV3(DEFAULT_SPEC); S.site.pages[0].label = "Home"; S.pageKey = ""; S.mode = "web"; S.app = emptyApp(); S.appSec = "layout"; S.tab = "sec";
+var LIVE = null, LIVEAPP = null, LIVELAY = null, LIVESTAT = null, REVIEWS = [], MYREV = null;
 var NAMES = {}, nameWait = {};
 function nm(id, fb){ if(!id) return fb || "A teammate"; if(id === ME.id) return ME.name || "You"; if(NAMES[id] !== undefined) return NAMES[id] || fb || "A teammate";
   if(user && user.profiles && !nameWait[id]){ nameWait[id] = 1; clearTimeout(nm.t); nm.t = setTimeout(function(){ var ids = Object.keys(nameWait).filter(function(k){ return NAMES[k] === undefined; });
@@ -79,6 +79,7 @@ function subscribe(){ if(!db) return;
       try{ S.app[sec] = JSON.parse(x.data); SAVED["draft/app_" + sec] = JSON.stringify({data:x.data}); if(S.mode === "app") renderApp(false); }catch(e){} }, function(){}); });
   db.doc("live/status").onSnapshot(function(d){ LIVESTAT = d && d.exists ? d.data() : null; if(S.mode === "team") renderTeam(); }, function(){});
   db.doc("live/site").onSnapshot(function(d){ var x = d && d.exists ? d.data() : null; if(x && x.site) restoreImgs(JSON.parse(x.site)).then(function(s){ LIVE = s; }); }, function(){});
+  db.doc("live/layout").onSnapshot(function(d){ var x = d && d.exists ? d.data() : null; try{ LIVELAY = x && x.layout ? JSON.parse(x.layout) : null; }catch(e){} }, function(){});
   db.doc("live/app").onSnapshot(function(d){ var x = d && d.exists ? d.data() : null; try{ LIVEAPP = x && x.content ? JSON.parse(x.content) : null; }catch(e){} }, function(){});
   db.collection("reviews").onSnapshot(function(q){ REVIEWS = q.docs.map(function(d){ var x = d.data() || {}; x.id = d.id; return x; }); MYREV = REVIEWS.filter(function(r){ return r.id === ME.id; })[0] || null;
     $("teamDot").hidden = !(ME.owner ? REVIEWS.some(function(r){ return r.status === "pending"; }) : MYREV && MYREV.status === "returned"); if(S.mode === "team") renderTeam(); }, function(){});
@@ -201,11 +202,12 @@ function appLockUI(){ var b = $("appLock"); if(!b) return; var a = "app_" + S.ap
   b.hidden = !lk; if(lk) b.innerHTML = '<b>' + esc(holderOf(a)) + '</b> is editing ' + esc(areaName(a)) + '. You\'re watching live; it frees up a minute after they stop.';
   [].forEach.call(document.querySelectorAll("#appEd input,#appEd textarea,#appEd select,#appEd button.sm,#appEd .addi"), function(x){ x.disabled = !!lk; }); }
 function renderApp(full){ var M = $("appMode"); if(full || !$("appEd")){
-    M.innerHTML = '<nav class="anav" aria-label="App content">' + APPSECS.map(function(x){ return '<button type="button" data-asec="' + x[0] + '" aria-current="' + (x[0] === S.appSec) + '">' + ico(x[2]) + '<span><b>' + x[1] + '</b><small id="cnt_' + x[0] + '"></small></span></button>'; }).join("") +
-      '<p class="hint">Everything here reaches every cadet\'s app after the owner approves it. Plain text only.</p></nav><div class="aed"><div class="lockbar" id="appLock" hidden></div><div id="appEd"></div></div><aside class="aphone" aria-label="How it looks in the app"><div class="ph"><div class="phs" id="phone"></div></div><p class="hint">Preview of Home and today\'s minute call in the app.</p></aside>';
+    M.innerHTML = '<nav class="anav" aria-label="App content">' + APPSECS.map(function(x){ return (x[0] === "layout" ? '<span class="agrp">BUILD THE APP</span>' : x[0] === "notices" ? '<span class="agrp">TEAM UPDATES</span>' : "") + '<button type="button" data-asec="' + x[0] + '" aria-current="' + (x[0] === S.appSec) + '">' + ico(x[2]) + '<span><b>' + x[1] + '</b><small id="cnt_' + x[0] + '"></small></span></button>'; }).join("") +
+      '<p class="hint">Everything here reaches every cadet\'s app after the owner approves it.</p></nav><div class="aed"><div class="lockbar" id="appLock" hidden></div><div id="appEd"></div></div><aside class="aphone" aria-label="How it looks in the app"><div class="ph"><div class="phs" id="phone"></div></div><p class="hint" id="phoneCap">How it looks in the app.</p></aside>';
     [].forEach.call(M.querySelectorAll("[data-asec]"), function(b){ b.onclick = function(){ S.appSec = b.dataset.asec; renderApp(true); acquireWanted(); }; }); }
-  APPSECS.forEach(function(x){ var c = $("cnt_" + x[0]); if(!c) return; var v = S.app[x[0]], n = Array.isArray(v) ? v.length : v ? Object.keys(v).filter(function(k){ return k >= ymd(new Date()); }).length : 0; c.textContent = x[0] === "links" ? "share a setup" : n ? n + (x[0] === "menus" || x[0] === "officers" || x[0] === "uniforms" ? " days" : "") : "none"; });
+  APPSECS.forEach(function(x){ var c = $("cnt_" + x[0]); if(!c) return; if(x[0] === "layout"){ c.textContent = "menu, Home, tiles"; return; } if(x[0] === "sections"){ var ns = (S.app.sections || []).length; c.textContent = ns ? ns + " section" + (ns > 1 ? "s" : "") : "build your own"; return; } var v = S.app[x[0]], n = Array.isArray(v) ? v.length : v ? Object.keys(v).filter(function(k){ return k >= ymd(new Date()); }).length : 0; c.textContent = x[0] === "links" ? "share a setup" : n ? n + (x[0] === "menus" || x[0] === "officers" || x[0] === "uniforms" ? " days" : "") : "none"; });
   var E = $("appEd"), sec = S.appSec, a = S.app, h = "";
+  if(sec === "layout" || sec === "sections"){ var sy = E.scrollTop; E.innerHTML = sec === "layout" ? layoutHTML() : sectionsHTML(); (sec === "layout" ? wireLayout : wireSections)(); drawPhone(); appLockUI(); return; }
   if(sec === "notices"){ h = '<h2>Announcements</h2><p class="hint">Cards on every cadet\'s Home under "From the FPLN team". Each cadet can dismiss one with Got it. Use dates to schedule them.</p>' +
       (a.notices || []).map(function(n, i){ return '<div class="acard tone-' + esc(n.tone || "info") + '"><div class="ih"><b>' + (i + 1) + '</b><button type="button" class="sm" data-nmv="' + i + '.-1"' + (i ? "" : " disabled") + '>↑</button><button type="button" class="sm" data-nmv="' + i + '.1"' + (i < a.notices.length - 1 ? "" : " disabled") + '>↓</button><button type="button" class="sm del" data-nrm="' + i + '">Remove</button></div>' +
         fld("Title", '<input type="text" data-n="' + i + '.title" maxlength="80" value="' + esc(n.title || "") + '">') + fld("Message", '<textarea data-n="' + i + '.body" maxlength="600" rows="3">' + esc(n.body || "") + '</textarea>') +
@@ -245,7 +247,9 @@ function wireApp(){ var E = $("appEd");
     el.className = "uparse " + (r ? r.k ? "ok" : "bad" : ""); el.textContent = r ? r.k ? r.text + (r.unknown.length ? " · can't show: " + r.unknown.join(" ") : "") : "No uniform found. Start with ACU, As for Class, White over Gray…" : "";
     appEdit("uniforms", function(M){ if(v.trim()) M[d] = v; else delete M[d]; }); }; });
   [].forEach.call(E.querySelectorAll("[data-copy]"), function(b){ b.onclick = function(){ copyText(b.dataset.copy, b); }; }); }
-function drawPhone(){ var P = $("phone"); if(!P) return; var a = appOut(S.app), td = ymd(new Date()), on = a.notices.filter(function(n){ return (!n.from || n.from <= td) && (!n.until || td <= n.until); });
+function drawPhone(){ var P = $("phone"); if(!P) return; P.classList.remove("lyp");
+  if($("phoneCap")) $("phoneCap").textContent = S.appSec === "layout" ? "Home and the menu, as cadets will see them. Click anything to select it." : S.appSec === "sections" ? "The section working as cadets see it. Try the buttons." : "Preview of Home and today\'s minute call in the app.";
+  if(S.appSec === "layout") return drawLayoutPhone(P); if(S.appSec === "sections") return drawSecPhone(P); var a = appOut(S.app), td = ymd(new Date()), on = a.notices.filter(function(n){ return (!n.from || n.from <= td) && (!n.until || td <= n.until); });
   var mn = a.menus[td] || {}, of = a.officers[td] || {}, u = a.uniforms[td], uq = u && window.FPLNUOD ? FPLNUOD.parse(u) : null, lines = [];
   lines.push("Sir, there are five minutes until assembly for dinner formation."); if(uq && uq.k) lines.push("The uniform for dinner formation is " + (uq.unknown.length ? u : uq.text) + ".");
   lines.push("The menu for dinner is " + (mn.dinner || "not yet posted") + "."); if(of.oic) lines.push("The officer in charge is " + of.oic + "."); if(of.ood) lines.push("The officer of the day is " + of.ood + ".");
@@ -255,6 +259,7 @@ function drawPhone(){ var P = $("phone"); if(!P) return; var a = appOut(S.app), 
     (a.quotes.length ? '<div class="pq">“' + esc(a.quotes[0].q) + '”<small>— ' + esc(a.quotes[0].by || "FPLN team") + '</small></div>' : "") +
     '<div class="pth">TODAY\'S MINUTE CALL</div><div class="pmc">' + lines.map(function(l){ return '<p>' + esc(l) + '</p>'; }).join("") + '</div>'; }
 
+/*STUDIO-APP*/
 /* ---------- team: people, reviews, publishing ---------- */
 function ago(t){ var s = Math.round((Date.now() - (+t || 0)) / 1000); return s < 60 ? "just now" : s < 3600 ? Math.round(s / 60) + " min ago" : s < 86400 ? Math.round(s / 3600) + " h ago" : Math.round(s / 86400) + " d ago"; }
 var ACTS = [];
@@ -272,24 +277,35 @@ function renderTeam(){ var T = $("teamMode"), ps = PEERS.filter(function(p){ ret
   h += '<section class="tc"><h2>Recent work</h2><div id="acts">' + (ACTS.length ? ACTS.slice(0, 20).map(function(x){ return '<div class="act"><b>' + esc(nm(x.by, "Teammate")) + '</b> ' + esc(x.what) + ' <small>' + esc(ago(x.at)) + '</small></div>'; }).join("") : '<p class="hint">No activity yet.</p>') + '</div></section></div>';
   T.innerHTML = h;
   [].forEach.call(T.querySelectorAll("[data-rev]"), function(b){ b.onclick = function(){ openReview(REVIEWS.filter(function(r){ return r.id === b.dataset.rev; })[0]); }; });
-  if($("pubMine")) $("pubMine").onclick = function(){ snapshot().then(function(sn){ openReview({id:ME.id, at:Date.now(), note:"Your own draft", site:sn.site, app:sn.app, own:true}); }); }; }
+  if($("pubMine")) $("pubMine").onclick = function(){ snapshot().then(function(sn){ openReview({id:ME.id, at:Date.now(), note:"Your own draft", site:sn.site, app:sn.app, layout:sn.layout, own:true}); }); }; }
 function loadActs(){ if(!db) return; db.collection("activity").onSnapshot(function(q){ var all = []; q.docs.forEach(function(d){ var x = d.data() || {}; (x.items || []).forEach(function(it){ all.push({by:d.id, what:it.what, at:it.at}); }); });
   ACTS = all.sort(function(a, b){ return b.at - a.at; }); if(S.mode === "team") renderTeam(); }, function(){}); }
 
 /* a submission is the whole draft: site (pictures as references) and app content */
 function snapshot(){ var site = siteOut(), r = stripImgs(site), jobs = Object.keys(r.imgs).filter(function(h){ return !savedImgs[h]; }).map(function(h){ return db ? db.doc("imgs/" + h).set({uri:r.imgs[h], at:Date.now()}).then(function(){ savedImgs[h] = 1; }) : null; });
-  return Promise.all(jobs).then(function(){ return {site:JSON.stringify(r.o), app:JSON.stringify(appOut(S.app)), full:site}; }); }
+  return Promise.all(jobs).then(function(){ return {site:JSON.stringify(r.o), app:JSON.stringify(appOut(S.app)), layout:JSON.stringify(layoutOut()), full:site}; }); }
 $("pubBtn").onclick = function(){ if(ME.owner){ setMode("team"); $("pubMine").click(); return; }
-  var site = siteOut(), bad = checkSite(site).concat(appCheck(S.app).map(function(x){ return "App › " + x; }));
+  var site = siteOut(), bad = checkSite(site).concat(appCheck(S.app).map(function(x){ return "App › " + x; })).concat(FPLNLY.problems(layoutOut()).map(function(x){ return "App layout › " + x; }));
   $("pubChk").innerHTML = bad.length ? '<p class="msg bad"><b>Fix these first</b> (the safety check would stop them):<ul>' + bad.slice(0, 8).map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></p>" : '<p class="msg ok"><b>✓ Passes the safety check.</b> ' + site.pages.length + ' page' + (site.pages.length > 1 ? "s" : "") + ' and the app content.</p>';
   $("pubGo").disabled = !!bad.length || !db; $("pubNote").value = ""; open("pubM"); };
 $("pubGo").onclick = function(){ var b = $("pubGo"); b.disabled = true; b.textContent = "SUBMITTING…";
-  snapshot().then(function(sn){ return db.doc("reviews/" + ME.id).set({by:ME.id, at:Date.now(), note:$("pubNote").value.slice(0, 500), status:"pending", site:sn.site, app:sn.app, reply:""}); })
+  snapshot().then(function(sn){ return db.doc("reviews/" + ME.id).set({by:ME.id, at:Date.now(), note:$("pubNote").value.slice(0, 500), status:"pending", site:sn.site, app:sn.app, layout:sn.layout, reply:""}); })
     .then(function(){ close("pubM"); toast("Submitted. The owner will review it."); logAct("submitted changes for review"); }, function(e){ toast(e && /large|exhaust/.test(e.code || "") ? "Too big to submit. Remove a large picture and try again." : "Couldn't submit. Try again."); })
     .then(function(){ b.disabled = false; b.textContent = "SUBMIT"; }); };
 
 /* review: what changed against what's live, then approve (publish) or send back */
 var REV = null;
+/* what changes in the app's layout and sections, against what's live */
+function lyDiff(lay){ if(!lay) return []; var O = LIVELAY || {v:1, nav:[], home:[], tiles:[], sections:[]}, out = [];
+  ["nav","home","tiles"].forEach(function(g){ var nm2 = {nav:"Menu", home:"Home order", tiles:"Home tiles"}[g]; if(JSON.stringify(lay[g] || []) !== JSON.stringify(O[g] || [])){
+    var a = FPLNLY.merge(FPLNLY.clean(lay), {})[g], b = FPLNLY.merge(FPLNLY.clean(O), {})[g], hid = a.filter(function(x){ return x.hide && !b.some(function(y){ return y.k === x.k && y.hide; }); }).map(function(x){ return x.n; }),
+      shown = a.filter(function(x){ return !x.hide && b.some(function(y){ return y.k === x.k && y.hide; }); }).map(function(x){ return x.n; }), ren = a.filter(function(x){ return b.some(function(y){ return y.k === x.k && y.n !== x.n; }); }).map(function(x){ return x.n; });
+    var moved = JSON.stringify(a.map(function(x){ return x.k; })) !== JSON.stringify(b.map(function(x){ return x.k; }));
+    out.push(["App " + nm2.toLowerCase(), [moved && "reordered", hid.length && "hides " + hid.join(", "), shown.length && "shows " + shown.join(", "), ren.length && "renamed " + ren.join(", ")].filter(Boolean).join("; ") || "changed"]); } });
+  var os = {}; (O.sections || []).forEach(function(x){ os[x.id] = x; });
+  (lay.sections || []).forEach(function(x){ var o = os[x.id]; if(!o) out.push(["New section", x.title + " (" + ({home:"on Home", page:"own page", both:"Home + own page"}[x.place || "home"]) + ", " + (x.blocks || []).length + " blocks)"]); else if(JSON.stringify(o) !== JSON.stringify(x)) out.push(["Changed section", x.title]); delete os[x.id]; });
+  Object.keys(os).forEach(function(k){ out.push(["Removed section", os[k].title]); });
+  return out; }
 function diff(site, app){ var L = LIVE ? FPLNSITE.toV3(LIVE) : null, A = LIVEAPP || {v:1, notices:[], menus:{}, officers:{}, days:[], quotes:[], uniforms:{}}, out = [];
   if(!L) out.push(["New", "Whole website (nothing published from the Studio yet)"]);
   else { if(JSON.stringify([L.theme, L.nav, L.title]) !== JSON.stringify([site.theme, site.nav, site.title])) out.push(["Changed", "Look, colors, fonts or top bar"]);
@@ -303,19 +319,20 @@ function diff(site, app){ var L = LIVE ? FPLNSITE.toV3(LIVE) : null, A = LIVEAPP
   [["notices","announcements"],["days","days-until"],["quotes","quotes"]].forEach(function(x){ var a = JSON.stringify(app[x[0]] || []), b = JSON.stringify(A[x[0]] || []); if(a !== b) out.push(["App", (app[x[0]] || []).length + " " + x[1] + " (was " + (A[x[0]] || []).length + ")"]); });
   [["menus","menus"],["officers","officers"],["uniforms","uniforms"]].forEach(function(x){ var a = JSON.stringify(app[x[0]] || {}), b = JSON.stringify(A[x[0]] || {}); if(a !== b) out.push(["App", x[1] + " for " + Object.keys(app[x[0]] || {}).length + " day(s)"]); });
   return out; }
-function openReview(r){ if(!r) return; REV = r; var site, app;
-  try{ site = JSON.parse(r.site); app = JSON.parse(r.app); }catch(e){ toast("That submission couldn't be read."); return; }
-  restoreImgs(site).then(function(full){ var bad = checkSite(full).concat(appCheck(app).map(function(x){ return "App › " + x; })), d = diff(full, app);
+function openReview(r){ if(!r) return; REV = r; var site, app, lay;
+  try{ site = JSON.parse(r.site); app = JSON.parse(r.app); lay = r.layout ? JSON.parse(r.layout) : null; }catch(e){ toast("That submission couldn't be read."); return; }
+  restoreImgs(site).then(function(full){ var bad = checkSite(full).concat(appCheck(app).map(function(x){ return "App › " + x; })).concat(lay ? FPLNLY.problems(lay).map(function(x){ return "App layout › " + x; }) : []), d = diff(full, app).concat(lyDiff(lay));
     $("revT").textContent = r.own ? "Publish your draft" : "Review: " + nm(r.id, "Teammate");
     $("revBody").innerHTML = (r.note ? '<p class="reply">“' + esc(r.note) + '”</p>' : "") + '<h3>What changes</h3>' + (d.length ? '<ul class="diff">' + d.map(function(x){ return '<li><i>' + esc(x[0]) + '</i>' + esc(x[1]) + '</li>'; }).join("") + '</ul>' : '<p class="hint">Nothing differs from what\'s live.</p>') +
       (bad.length ? '<p class="msg bad"><b>The safety check would stop this:</b><ul>' + bad.slice(0, 8).map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + '</ul></p>' : '<p class="msg ok"><b>✓ Passes the safety check.</b> GitHub runs it again before anything goes live.</p>') +
       (!mcp ? '<p class="msg warn">Publishing runs your FPLN control task. Allow this page to use Claude Code Remote when asked.</p>' : "");
-    $("revGo").disabled = !!bad.length; $("revBack").hidden = !!r.own; $("revNote").value = ""; $("revNote").parentNode.hidden = !!r.own; REV.full = full; REV.appObj = app; open("revM"); }); }
+    $("revGo").disabled = !!bad.length; $("revBack").hidden = !!r.own; $("revNote").value = ""; $("revNote").parentNode.hidden = !!r.own; REV.full = full; REV.appObj = app; REV.layObj = lay; open("revM"); }); }
 $("revBack").onclick = function(){ if(!REV || !db) return; db.doc("reviews/" + REV.id).update({status:"returned", reply:$("revNote").value.slice(0, 500), at2:Date.now()}).then(function(){ close("revM"); toast("Sent back to " + nm(REV.id, "them")); logAct("sent back a submission"); }); };
 $("revGo").onclick = function(){ if(!REV || !db || !ME.owner) return; var b = $("revGo"), r = REV; b.disabled = true; b.textContent = "PUBLISHING…";
   var site = stripImgs(r.full).o;
   db.doc("live/site").set({site:JSON.stringify(site), at:Date.now(), by:ME.id, review:r.id})
     .then(function(){ return db.doc("live/app").set({content:JSON.stringify(r.appObj), at:Date.now(), by:ME.id, review:r.id}); })
+    .then(function(){ return r.layObj ? db.doc("live/layout").set({layout:JSON.stringify(r.layObj), at:Date.now(), by:ME.id, review:r.id}) : null; })
     .then(function(){ return db.doc("live/status").set({state:"publishing", at:Date.now(), detail:"Sent to the FPLN control task. It checks everything, then puts it live.", review:r.id}); })
     .then(function(){ return r.own ? null : db.doc("reviews/" + r.id).update({status:"approved", reply:$("revNote").value.slice(0, 500), at2:Date.now()}); })
     .then(function(){ if(!mcp) throw {code:"no_mcp"}; return mcp.callTool("Claude Code Remote", "fire_trigger", {trigger_id:TRIG, text:"FPLN-CONTROL action=publish-studio ring=all at=" + Date.now() + " off=none msg=" + (r.own ? "owner-draft" : "review-" + String(r.id || "").replace(/[^\w-]/g, "").slice(0, 40))}); })

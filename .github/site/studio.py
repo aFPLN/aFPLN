@@ -8,7 +8,7 @@ Run: python3 .github/site/studio.py   then   python3 .github/site/build.py --stu
 import os, re
 S = os.path.dirname(os.path.abspath(__file__))
 s = open(os.path.join(S, "builder.src.html"), encoding="utf-8").read()
-JS = open(os.path.join(S, "studio.js"), encoding="utf-8").read()
+JS = open(os.path.join(S, "studio.js"), encoding="utf-8").read().replace("/*STUDIO-APP*/", open(os.path.join(S, "studio-app.js"), encoding="utf-8").read())
 CSS = open(os.path.join(S, "studio.style.html"), encoding="utf-8").read().replace("<style>", "").replace("</style>", "").strip()
 def rep(a, b, n=1):
     global s
@@ -18,7 +18,7 @@ def cut(start, end, new):
     i = s.index(start); j = s.index(end, i); s = s[:i] + new + s[j:]
 
 rep("<title>FPLN Site Builder</title>", "<title>FPLN Studio</title>")
-rep("\n<script>\n", "\n<script>/*UOD*/</script>\n<script>\n")
+rep("\n<script>\n", "\n<script>/*UOD*/</script>\n<script>/*LYCORE*/</script>\n<script>\n")
 rep('''@media (max-width:1180px){.app{''', CSS + '''\n@media (max-width:1180px){.app{''')
 rep('''<div class="gate" id="gate"><div><b>OWNER ONLY</b><p style="color:var(--dim)">The FPLN Site Builder is for FPLN's owner.</p></div></div>''',
     '''<div class="gate" id="gate"><div><b>SIGN IN TO EDIT</b><p style="color:var(--dim)" id="gateT">FPLN Studio saves the team's work in a shared draft. Open it signed in to claude.ai with access to this page.</p></div></div>''')

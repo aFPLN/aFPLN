@@ -6,8 +6,8 @@ references), live/app (content.json as a string) and imgs/<hash> (one picture ea
 
   1. python3 .github/site/studio_publish.py needs --site <live/site doc .json>
        prints the picture hashes the site uses, one per line (read each imgs/<hash> doc into the same folder).
-  2. python3 .github/site/studio_publish.py apply --site <doc> --app <doc> --imgs <folder> --root .
-       writes site.json and content.json, runs sitecheck, contentcheck and build.py, and prints JSON:
+  2. python3 .github/site/studio_publish.py apply --site <doc> --app <doc> [--layout <doc>] --imgs <folder> --root .
+       writes site.json, content.json and layout.json, runs sitecheck, contentcheck, layoutcheck and build.py, and prints JSON:
        {"ok": true, "pages": N, "uniforms": {"YYYY-MM-DD": "text", ...}}  (uniforms from today on, for control.py uod)
        Exit 1 with the reason when anything fails; nothing is committed by this script.
 Docs may be the bare document or wrapped as {"data": {...}} (both forms of an ArtifactData read are accepted)."""
@@ -16,7 +16,7 @@ import argparse, datetime, glob, json, os, re, subprocess, sys
 def doc(p):
     d = json.load(open(p, encoding="utf-8"))
     for _ in range(3):
-        if isinstance(d, dict) and isinstance(d.get("data"), dict) and not ({"site", "content", "uri"} & set(d)): d = d["data"]
+        if isinstance(d, dict) and isinstance(d.get("data"), dict) and not ({"site", "content", "uri", "layout"} & set(d)): d = d["data"]
         elif isinstance(d, dict) and isinstance(d.get("document"), dict): d = d["document"]
         else: break
     return d
@@ -31,7 +31,7 @@ def refs(x, out):
 def fail(msg): print(json.dumps({"ok": False, "error": msg})); sys.exit(1)
 
 a = argparse.ArgumentParser(); a.add_argument("cmd", choices=["needs", "apply"]); a.add_argument("--site", required=True)
-a.add_argument("--app"); a.add_argument("--imgs", default="."); a.add_argument("--root", default=".")
+a.add_argument("--app"); a.add_argument("--layout"); a.add_argument("--imgs", default="."); a.add_argument("--root", default=".")
 o = a.parse_args()
 try: site = json.loads(doc(o.site)["site"])
 except Exception as e: fail("live/site could not be read: %s" % e)
@@ -57,6 +57,8 @@ if not isinstance(site, dict) or site.get("v") != 3: fail("live/site is not a v3
 
 try: app = json.loads(doc(o.app)["content"]) if o.app else None
 except Exception as e: fail("live/app could not be read: %s" % e)
+try: lay = json.loads(doc(o.layout)["layout"]) if o.layout and os.path.exists(o.layout) else None
+except Exception as e: fail("live/layout could not be read: %s" % e)
 today = datetime.date.today().isoformat()
 uod = {}
 if app is not None:
@@ -74,5 +76,10 @@ run(sys.executable, ".github/safety/sitecheck.py", "site.json")
 if app is not None:
     json.dump(app, open(os.path.join(R, "content.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1); open(os.path.join(R, "content.json"), "a").write("\n")
     run(sys.executable, ".github/safety/contentcheck.py", "content.json")
+if lay is not None:
+    if not isinstance(lay, dict): fail("live/layout is not an object")
+    lay["v"] = 1; lay["updated"] = today
+    json.dump(lay, open(os.path.join(R, "layout.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1); open(os.path.join(R, "layout.json"), "a").write("\n")
+    run(sys.executable, ".github/safety/layoutcheck.py", "layout.json")
 run(sys.executable, ".github/site/build.py")
-print(json.dumps({"ok": True, "pages": len(site.get("pages") or []), "uniforms": uod}))
+print(json.dumps({"ok": True, "pages": len(site.get("pages") or []), "sections": len((lay or {}).get("sections") or []), "uniforms": uod}))
