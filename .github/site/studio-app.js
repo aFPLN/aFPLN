@@ -137,3 +137,101 @@ function drawSecPhone(P){ var s = curSec(); P.classList.add("lyp"); if(!s){ P.in
   var c = (FPLNLY.clean(layoutOut()) || {sections:[]}).sections.filter(function(x){ return x.id === s.id; })[0]; P.innerHTML = '<div class="pth" style="margin:2px 0 8px">' + ({home:"ON HOME", page:"ITS OWN PAGE", both:"ON HOME AND ITS OWN PAGE"}[s.place || "home"]) + '</div>';
   var el = document.createElement("div"); P.appendChild(el); if(c) FPLNLY.render(document, el, c, {store:pvStore, go:function(to){ toast("In the app this opens " + (FPLNLY.GONAME[to] || "that section")); }});
   var n = (s.blocks || []).length - (c ? c.blocks.length : 0); if(n > 0){ var w = document.createElement("p"); w.className = "msg warn"; w.style.marginTop = "10px"; w.textContent = n + " block" + (n > 1 ? "s aren't" : " isn't") + " shown yet: fill in every field (a link must go to a .edu, .mil or .gov site; reminders need a time; countdowns need a date)."; P.appendChild(w); } }
+
+/* ---------- requests: anyone asks, the owner decides ---------- */
+/* requests/<uid> = {items:[{id, text, where, kind, at}]} written by that person; replies/<uid> = {<id>:{status, reply, at}} written only by the owner */
+var REQS = {}, REPLIES = {}, aiTab = "req";
+function reqList(){ var out = []; Object.keys(REQS).forEach(function(uid){ (REQS[uid].items || []).forEach(function(it){ var r = (REPLIES[uid] || {})[it.id] || {}; out.push({uid:uid, id:it.id, text:String(it.text || ""), where:it.where || "", kind:it.kind || "", at:+it.at || 0, status:r.status || "new", reply:r.reply || "", rat:r.at || 0}); }); });
+  return out.sort(function(a, b){ var w = function(x){ return x.status === "new" ? 0 : 1; }; return w(a) - w(b) || b.at - a.at; }); }
+function loadReqs(){ if(!db) return;
+  db.collection("requests").onSnapshot(function(q){ REQS = {}; q.docs.forEach(function(d){ REQS[d.id] = d.data() || {}; }); reqChanged(); }, function(){});
+  db.collection("replies").onSnapshot(function(q){ REPLIES = {}; q.docs.forEach(function(d){ REPLIES[d.id] = d.data() || {}; }); reqChanged(); }, function(){}); }
+function reqChanged(){ var L = reqList(), waiting = L.filter(function(r){ return r.status === "new"; }).length, mineNew = L.filter(function(r){ return r.uid === ME.id && r.status !== "new" && r.rat > (+lsGet("fpln-studio:seenReplies") || 0); }).length;
+  var dot = $("aiDot"); if(dot){ dot.hidden = !(ME.owner ? waiting : mineNew); dot.textContent = ME.owner ? String(waiting) : "!"; }
+  if($("aiM").classList.contains("on") && aiTab === "req") drawReq(); if(S.mode === "team") renderTeam(); }
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } } function lsSet(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+var RQST = {new:["Waiting for the owner","new"], approved:["Approved","ok"], building:["Approved · being built","ok"], done:["Done","ok"], declined:["Declined","bad"]};
+function reqCard(r, owner){ var st = RQST[r.status] || RQST.new;
+  var h = '<div class="rq" data-rq="' + esc(r.uid + "/" + r.id) + '"><div class="rqh"><b>' + esc(owner ? nm(r.uid, "Teammate") : "You") + '</b><small>' + esc(ago(r.at)) + (r.where ? " · " + esc(r.where) : "") + (r.kind ? " · " + esc(r.kind) : "") + '</small><span class="rqs ' + st[1] + '">' + esc(st[0]) + '</span></div><p class="rqt">' + esc(r.text) + '</p>' +
+    (r.reply ? '<p class="reply">' + (owner ? "Your note: " : "Owner: ") + '“' + esc(r.reply) + '”</p>' : "");
+  if(owner) h += '<div class="rqa"><input type="text" class="rqn" maxlength="300" placeholder="Note back (optional)">' +
+      '<button type="button" class="ib pub" data-rqbuild>' + (sample ? "APPROVE &amp; DRAFT WITH AI" : "APPROVE") + '</button>' + (sample ? '<button type="button" class="ib" data-rqok>Approve only</button>' : "") +
+      '<button type="button" class="ib" data-rqdone>Mark done</button><button type="button" class="ib" data-rqno>Decline</button><button type="button" class="ib" data-rqcopy>Copy for Claude</button></div><div class="rqout"></div>';
+  else if(r.status === "new") h += '<div class="rqa"><button type="button" class="ib" data-rqdel>Withdraw</button></div>';
+  return h + '</div>'; }
+var RQOUT = {}, RQMSG = "";
+function drawReq(){ var B = $("aiReq"); if(!B) return; var L = reqList(), h = "", keep = {txt:$("rqText") ? $("rqText").value : "", notes:{}, focus:document.activeElement && B.contains(document.activeElement) ? (document.activeElement.id || (document.activeElement.closest("[data-rq]") || {dataset:{}}).dataset.rq) : null};
+  [].forEach.call(B.querySelectorAll("[data-rq]"), function(c){ var n = c.querySelector(".rqn"); if(n) keep.notes[c.dataset.rq] = n.value; });
+  { h += '<p class="hint">Ask for a new feature, a change or a fix to the app or website. The owner reads every request and decides; nothing reaches cadets until the owner approves and publishes it.</p>' +
+      '<div class="row3">' + fld("Where", '<select id="rqWhere"><option>App</option><option>Website</option><option>Not sure</option></select>') + fld("What kind", '<select id="rqKind"><option>New feature</option><option>Change</option><option>Fix</option></select>') + '</div>' +
+      fld("Your request", '<textarea id="rqText" rows="4" maxlength="1000" placeholder="e.g. A sleep section on Home where cadets log their hours and get a lights-out reminder at 2300 on school nights"></textarea>', "be specific: what it does, where it shows") +
+      '<div class="end" style="margin-top:6px"><button type="button" class="ib pub" id="rqGo"' + (db && ME.id ? "" : " disabled") + '>SEND REQUEST</button></div><div id="rqMsg"></div>'; }
+  var mine = L.filter(function(r){ return r.uid === ME.id; });
+  if(ME.owner){ var others = L, w = others.filter(function(r){ return r.status === "new"; }).length;
+    h += '<h3 class="rqhd">Requests from the team <span class="cnt">' + w + ' waiting</span></h3>' + (others.length ? others.slice(0, 40).map(function(r){ return reqCard(r, true); }).join("") : '<p class="hint">No requests yet. Share this page with your team; they ask here.</p>'); }
+  else if(mine.length){ h += '<h3 class="rqhd">Your requests</h3>' + mine.map(function(r){ return reqCard(r, false); }).join(""); lsSet("fpln-studio:seenReplies", String(Date.now())); var dot = $("aiDot"); if(dot) dot.hidden = true; }
+  B.innerHTML = h;
+  if($("rqText")) $("rqText").value = keep.txt; if($("rqMsg")) $("rqMsg").innerHTML = RQMSG;
+  [].forEach.call(B.querySelectorAll("[data-rq]"), function(c){ var n = c.querySelector(".rqn"), k = c.dataset.rq; if(n && keep.notes[k]) n.value = keep.notes[k]; var o = c.querySelector(".rqout"); if(o && RQOUT[k]) o.innerHTML = RQOUT[k]; });
+  if(keep.focus){ var f = $(keep.focus) || (B.querySelector('[data-rq="' + keep.focus + '"] .rqn')); if(f) try{ f.focus(); }catch(e){} }
+  wireReq(); }
+function myItems(){ return ((REQS[ME.id] || {}).items || []).slice(); }
+function wireReq(){
+  if($("rqGo")) $("rqGo").onclick = function(){ var t = $("rqText").value.trim(), m = $("rqMsg"), bad = FPLNLY.textBad(t);
+    if(t.length < 10){ RQMSG = m.innerHTML = '<p class="msg warn">Say a little more about what you want.</p>'; return; }
+    if(bad){ RQMSG = m.innerHTML = '<p class="msg bad">Your request contains ' + esc(bad) + '. Describe it in plain words instead.</p>'; return; }
+    var items = myItems(); if(items.filter(function(x){ var r = (REPLIES[ME.id] || {})[x.id]; return !r || r.status === "new"; }).length >= 10){ RQMSG = m.innerHTML = '<p class="msg warn">You have 10 requests waiting. Wait for the owner to answer some first.</p>'; return; }
+    items.push({id:"r" + Date.now().toString(36), text:t.slice(0, 1000), where:$("rqWhere").value, kind:$("rqKind").value, at:Date.now()});
+    var keep = items.slice(-30); this.disabled = true;
+    db.doc("requests/" + ME.id).set({items:keep, at:Date.now()}).then(function(){ $("rqText").value = ""; if($("rqText")) $("rqText").value = ""; RQMSG = m.innerHTML = '<p class="msg ok">Sent. The owner will see it in Ask AI and on the Team tab.</p>'; logAct("sent a request"); }, function(){ RQMSG = m.innerHTML = '<p class="msg bad">Couldn\'t send. Try again.</p>'; })
+      .then(function(){ if($("rqGo")) $("rqGo").disabled = false; }); };
+  [].forEach.call(document.querySelectorAll("#aiReq [data-rq]"), function(card){ var p = card.dataset.rq.split("/"), uid = p[0], id = p[1], r = reqList().filter(function(x){ return x.uid === uid && x.id === id; })[0]; if(!r) return;
+    function note(){ var n = card.querySelector(".rqn"); return n ? n.value.trim().slice(0, 300) : ""; }
+    function setSt(st, reply){ var o = {}; o[id] = {status:st, reply:reply || "", at:Date.now()}; return db.doc("replies/" + uid).get().then(function(d){ var cur = d && d.exists ? d.data() || {} : {}; cur[id] = o[id]; return db.doc("replies/" + uid).set(cur); }); }
+    var q = function(s){ return card.querySelector(s); };
+    if(q("[data-rqdel]")) q("[data-rqdel]").onclick = function(){ var items = myItems().filter(function(x){ return x.id !== id; }); db.doc("requests/" + ME.id).set({items:items, at:Date.now()}); };
+    if(q("[data-rqok]")) q("[data-rqok]").onclick = function(){ setSt("approved", note()).then(function(){ toast("Approved"); logAct("approved a request"); }); };
+    if(q("[data-rqdone]")) q("[data-rqdone]").onclick = function(){ setSt("done", note()).then(function(){ toast("Marked done"); }); };
+    if(q("[data-rqno]")) q("[data-rqno]").onclick = function(){ setSt("declined", note()).then(function(){ toast("Declined"); logAct("declined a request"); }); };
+    if(q("[data-rqcopy]")) q("[data-rqcopy]").onclick = function(){ copyText("FPLN feature request (" + (r.where || "") + ", " + (r.kind || "") + ") from a teammate, approved by me:\n" + r.text + "\n\nPlease build this in FPLN.", q("[data-rqcopy]")); };
+    if(q("[data-rqbuild]")) q("[data-rqbuild]").onclick = function(){ var btn = this, out = q(".rqout"), n = note();
+      if(!sample){ setSt("approved", n).then(function(){ toast("Approved"); }); return; }
+      btn.disabled = true; btn.textContent = "DRAFTING…"; out.innerHTML = '<p class="msg">Thinking…</p>';
+      aiDraft(r).then(function(res){ return setSt(res.code ? "approved" : "building", n || (res.code ? "Approved. This needs new code; I'll get it built." : "Approved. It's in the draft; it goes live when published.")).then(function(){ return res; }); })
+        .then(function(res){ RQOUT[uid + "/" + id] = out.innerHTML = res.html; logAct("approved a request and drafted it with AI"); },
+          function(e){ RQOUT[uid + "/" + id] = out.innerHTML = '<p class="msg bad">' + esc(e && e.code === "rate_limited" ? "Too many AI requests right now. Try again in a minute." : e && e.code === "not_granted" ? "AI access wasn't allowed for this page." : (e && e.message) || "The AI couldn't draft it. Nothing changed.") + '</p>'; })
+        .then(function(){ btn.disabled = false; btn.textContent = "APPROVE & DRAFT WITH AI"; }); }; }); }
+/* take one editing lock now (for drafting from the Ask AI window) */
+function grab(a){ if(held(a)) return Promise.resolve(true); if(!db || !ME.id) return Promise.resolve(false);
+  return db.doc("locks/" + a).acquire({holder:ME.id, ttlMs:90000, data:{uid:ME.id}}).then(function(r){ if(r && r.acquired){ HELD[a] = Date.now() + 85000; return true; } return db.doc("locks/" + a).get().then(function(d){ var x = d && d.exists ? d.data() : null; LOCKMSG[a] = x && x.uid ? String(x.uid) : "?"; return false; }); }, function(){ return false; }); }
+/* the owner's AI turns an approved request into a draft change (a custom section, a layout change, or a website change), or says it needs code */
+var SECSCHEMA = 'A custom section: {"id":short lowercase id,"title":str<=40,"icon":one of ' + JSON.stringify(FPLNLY.ICONS) + ',"color":"#rrggbb","place":"home|page|both","tile":bool,"tileText":str,"blocks":[...]} . Blocks (each has "id" short lowercase unique, "type"):\n' +
+  'heading {text,size:"s|m|l"} · text {text (**bold** ok)} · tip {tone:"info|good|warn",title,text} · list {style:"bullet|number|check",reset:"daily|weekly|none",items:[str<=20]} · tracker {label,kind:"number|yesno|scale",unit,goal,min,max,step} · reminder {label,time:"HH:MM" 24h,days:[0-6, 0=Sun],text,on:bool} · countdown {label,date:"YYYY-MM-DD"} · link {label,url: https only to .edu/.mil/.gov} · go {label,to: one of ' + JSON.stringify(FPLNLY.GO) + '} · divider {}.\n' +
+  'Layout lists: nav, home, tiles, each [{k,label?,hide?}] in order; built-in keys nav ' + JSON.stringify(FPLNLY.CAT.nav.map(function(x){ return x.k; })) + ', home ' + JSON.stringify(FPLNLY.CAT.home.map(function(x){ return x.k; })) + ', tiles ' + JSON.stringify(FPLNLY.CAT.tiles.map(function(x){ return x.k; })) + '; custom sections are "x:<id>".';
+function aiDraft(r){ var lay = layoutOut();
+  var prompt = "You help the owner of FPLN, a planner app made by and for West Point cadets, build an approved team request with FPLN Studio's no-code pieces.\n\nREQUEST (" + r.where + ", " + r.kind + "): " + r.text +
+    "\n\nWhat the Studio can make:\n" + SECSCHEMA + "\n\nCURRENT APP LAYOUT AND SECTIONS:\n" + JSON.stringify(lay) +
+    "\n\nDecide which fits best:\n- kind \"section\": a new or changed custom section (give the whole section; reuse an existing id to change one)\n- kind \"layout\": only reordering, hiding or renaming (give nav/home/tiles lists in full)\n- kind \"site\": a change to the public website (describe the change in one sentence in \"siteRequest\"; the owner will apply it)\n- kind \"code\": it needs new app behavior these pieces cannot do (explain briefly in \"cannot\")\n" +
+    "Rules: plain text only, no personal data, no controlled or sensitive military markings, realistic cadet-appropriate content, times in 24h.\n" +
+    'Reply with ONLY JSON: {"kind":"section|layout|site|code","section":{...}|null,"layout":{"nav":[],"home":[],"tiles":[]}|null,"siteRequest":"","summary":"one sentence","cannot":""}';
+  return sample.json(prompt, {modelTier:"default", cache:false}).then(function(res){ if(!res || !res.kind) throw {message:"The AI didn't return a plan."};
+    if(res.kind === "section" && res.section){ var s = res.section, test = clone(lay); s.id = String(s.id || "").toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 24) || newId(S.app.sections || [], s.title);
+      (s.blocks || []).forEach(function(b, i){ b.id = String(b.id || "").toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 24) || (b.type + "-" + (i + 1)); });
+      var ix = test.sections.map(function(x){ return x.id; }).indexOf(s.id); if(ix >= 0) test.sections[ix] = s; else test.sections.push(s);
+      var bad = FPLNLY.problems(test); if(bad.length) return {html:'<p class="msg bad"><b>The AI\'s section didn\'t pass the safety check, so nothing changed:</b><ul>' + bad.slice(0, 5).map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + '</ul></p>'};
+      return grab("app_sections").then(function(ok){ return ok ? apply() : {html:'<p class="msg warn">' + esc(holderOf("app_sections")) + ' is editing custom sections right now, so the draft wasn\'t added. Try again in a minute.</p>'}; });
+      function apply(){ appEdit("sections", function(L){ var j = L.map(function(x){ return x.id; }).indexOf(s.id); if(j >= 0) L[j] = s; else L.push(s); }, false); secSel = s.id;
+        return {html:'<p class="msg ok"><b>Approved and drafted.</b> ' + esc(res.summary || "") + ' Check it in App › Custom sections, then publish.</p>' + (res.cannot ? '<p class="msg warn"><b>Left out:</b> ' + esc(res.cannot) + '</p>' : "") + '<button type="button" class="ib" data-rqsee>Open it</button>'}; } }
+    if(res.kind === "layout" && res.layout){ var t2 = clone(lay); ["nav","home","tiles"].forEach(function(g){ if(Array.isArray(res.layout[g]) && res.layout[g].length) t2[g] = res.layout[g]; }); var b2 = FPLNLY.problems(t2);
+      if(b2.length) return {html:'<p class="msg bad"><b>The AI\'s layout didn\'t pass the safety check, so nothing changed:</b><ul>' + b2.slice(0, 5).map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + '</ul></p>'};
+      return grab("app_layout").then(function(ok){ if(!ok) return {html:'<p class="msg warn">Someone is editing the layout right now, so the draft wasn\'t changed. Try again in a minute.</p>'};
+        appEdit("layout", function(Lay){ ["nav","home","tiles"].forEach(function(g){ if(Array.isArray(res.layout[g]) && res.layout[g].length) Lay[g] = res.layout[g]; }); }, false);
+        return {html:'<p class="msg ok"><b>Approved and drafted.</b> ' + esc(res.summary || "") + ' Check it in App › Layout, then publish.</p><button type="button" class="ib" data-rqsee="layout">Open it</button>'}; }); }
+    if(res.kind === "site") return {html:'<p class="msg ok"><b>Approved.</b> ' + esc(res.summary || "") + '</p><p class="hint">Website change: ' + esc(res.siteRequest || r.text) + '</p><button type="button" class="ib" data-rqsite="' + esc(res.siteRequest || r.text) + '">Do it with Change the website now</button>'};
+    return {code:true, html:'<p class="msg warn"><b>Approved, but this needs new code.</b> ' + esc(res.cannot || res.summary || "The Studio's blocks can't do this yet.") + ' Use Copy for Claude and paste it into a chat with Claude to have it built.</p>'}; }); }
+document.addEventListener("click", function(e){ var b = e.target.closest && e.target.closest("[data-rqsee],[data-rqsite]"); if(!b || !$("aiReq").contains(b)) return;
+  if(b.hasAttribute("data-rqsite")){ aiTabSet("now"); setMode("web"); $("aiIn").value = b.getAttribute("data-rqsite"); $("aiIn").focus(); return; }
+  close("aiM"); S.appSec = b.getAttribute("data-rqsee") === "layout" ? "layout" : "sections"; setMode("app"); });
+function aiTabSet(t){ aiTab = t; [].forEach.call(document.querySelectorAll("[data-ait]"), function(b){ b.setAttribute("aria-selected", String(b.dataset.ait === t)); }); $("aiReq").hidden = t !== "req"; $("aiNow").hidden = t !== "now"; if(t === "req") drawReq(); }
+[].forEach.call(document.querySelectorAll("[data-ait]"), function(b){ b.onclick = function(){ aiTabSet(b.dataset.ait); }; });
+$("aiBtn").onclick = function(){ $("aiOut").innerHTML = sample ? "" : '<p class="msg warn">AI isn\'t available for your account here. Every change can still be made by hand, and you can send a request.</p>'; open("aiM"); aiTabSet(ME.owner && sample ? (reqList().some(function(r){ return r.status === "new"; }) ? "req" : aiTab) : "req"); };

@@ -53,6 +53,21 @@ cut('''<div class="modal" id="pubM"''', '''<div class="modal" id="picM"''', '''<
 </div></div>
 
 ''')
+# Ask AI: Requests (anyone) + Change the website now (AI)
+rep('''<div class="modal" id="aiM" role="dialog" aria-modal="true" aria-labelledby="aiT"><div class="box">
+  <h2 id="aiT">Ask AI to change the page</h2>''', '''<div class="modal" id="aiM" role="dialog" aria-modal="true" aria-labelledby="aiT"><div class="box wide">
+  <div class="seg aitabs" role="tablist" aria-label="Ask AI"><button type="button" role="tab" data-ait="req" aria-selected="true">Requests</button><button type="button" role="tab" data-ait="now" aria-selected="false">Change the website now</button></div>
+  <div id="aiReq"></div>
+  <div id="aiNow" hidden>
+  <h2 id="aiT">Ask AI to change the website</h2>''')
+rep('''  <div id="aiOut" style="margin-top:12px"></div>
+  <div class="end"><button type="button" class="ib" data-close>Close</button><button type="button" class="ib pub" id="aiGo">CHANGE IT</button></div>
+</div></div>''', '''  <div id="aiOut" style="margin-top:12px"></div>
+  <div class="end"><button type="button" class="ib pub" id="aiGo">CHANGE IT</button></div>
+  </div>
+  <div class="end"><button type="button" class="ib" data-close>Close</button></div>
+</div></div>''')
+rep('''<span class="lbl">Ask AI</span></button>''', '''<span class="lbl">Ask AI</span><span class="aidot" id="aiDot" hidden></span></button>''')
 # preview: page links in the top bar; clicking one switches page
 rep('''    var a = e.target.closest("a,button,summary"); if(a) e.preventDefault();''', '''    var a = e.target.closest("a,button,summary"); if(a) e.preventDefault();
     var pl = e.target.closest("[data-page]"); if(pl){ post({t:"page", slug:pl.getAttribute("data-page")}); return; }''')
