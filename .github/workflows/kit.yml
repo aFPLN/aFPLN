@@ -3,7 +3,7 @@ name: FPLN download machine
 on:
   push:
     branches: [main]
-    paths: ["share/**", "download/**", ".github/kit/**"]
+    paths: ["share/**", "download/**", ".github/kit/**", "version.json"]
   workflow_dispatch:
 permissions:
   contents: write
