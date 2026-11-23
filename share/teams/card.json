@@ -1,0 +1,365 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "msteams": {
+    "width": "Full"
+  },
+  "body": [
+    {
+      "type": "Image",
+      "url": "https://afpln.github.io/aFPLN/share/teams/header-2x1.png",
+      "altText": "FPLN. Own the day.",
+      "size": "Stretch",
+      "selectAction": {
+        "type": "Action.OpenUrl",
+        "url": "https://afpln.github.io/aFPLN/download/",
+        "tooltip": "Get FPLN"
+      }
+    },
+    {
+      "type": "TextBlock",
+      "text": "NOW IN BETA · CLEARED FOR TAKEOFF",
+      "size": "Small",
+      "weight": "Bolder",
+      "color": "Good",
+      "spacing": "Medium",
+      "fontType": "Monospace"
+    },
+    {
+      "type": "TextBlock",
+      "text": "Your day, planned like a flight.",
+      "size": "Large",
+      "weight": "Bolder",
+      "wrap": true,
+      "spacing": "Small"
+    },
+    {
+      "type": "TextBlock",
+      "text": "FPLN is a free planner built by cadets, for cadets. It knows what's next, when to leave, and what to wear, and your data stays on your own device.",
+      "wrap": true
+    },
+    {
+      "type": "FactSet",
+      "facts": [
+        {
+          "title": "Cost",
+          "value": "Free"
+        },
+        {
+          "title": "Updates",
+          "value": "Itself, automatically"
+        },
+        {
+          "title": "Your data",
+          "value": "Stays on your device"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "id": "inside",
+      "isVisible": false,
+      "separator": true,
+      "spacing": "Medium",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Tap a feature to open it in FPLN",
+          "size": "Small",
+          "isSubtle": true,
+          "wrap": true
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Medium",
+          "selectAction": {
+            "type": "Action.OpenUrl",
+            "url": "https://afpln.github.io/aFPLN/#go=ops",
+            "tooltip": "Open What's next in FPLN"
+          },
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "Image",
+                  "url": "https://afpln.github.io/aFPLN/share/email/ico-next.png",
+                  "width": "40px",
+                  "height": "40px",
+                  "altText": "What's next"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "verticalContentAlignment": "Center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "What's next",
+                  "weight": "Bolder",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Your next formation, class or duty, and when to leave.",
+                  "isSubtle": true,
+                  "spacing": "None",
+                  "wrap": true,
+                  "size": "Small"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Medium",
+          "selectAction": {
+            "type": "Action.OpenUrl",
+            "url": "https://afpln.github.io/aFPLN/#go=tasks",
+            "tooltip": "Open Tasks & brain dump in FPLN"
+          },
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "Image",
+                  "url": "https://afpln.github.io/aFPLN/share/email/ico-tasks.png",
+                  "width": "40px",
+                  "height": "40px",
+                  "altText": "Tasks & brain dump"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "verticalContentAlignment": "Center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Tasks & brain dump",
+                  "weight": "Bolder",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Jot a task in two seconds; FPLN fits it into your day.",
+                  "isSubtle": true,
+                  "spacing": "None",
+                  "wrap": true,
+                  "size": "Small"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Medium",
+          "selectAction": {
+            "type": "Action.OpenUrl",
+            "url": "https://afpln.github.io/aFPLN/#go=home",
+            "tooltip": "Open Alarm & minute calling in FPLN"
+          },
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "Image",
+                  "url": "https://afpln.github.io/aFPLN/share/email/ico-alarm.png",
+                  "width": "40px",
+                  "height": "40px",
+                  "altText": "Alarm & minute calling"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "verticalContentAlignment": "Center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Alarm & minute calling",
+                  "weight": "Bolder",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "A wake-up that briefs your day, and a heads-up before minute calling.",
+                  "isSubtle": true,
+                  "spacing": "None",
+                  "wrap": true,
+                  "size": "Small"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Medium",
+          "selectAction": {
+            "type": "Action.OpenUrl",
+            "url": "https://afpln.github.io/aFPLN/#go=home",
+            "tooltip": "Open Uniform of the day in FPLN"
+          },
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "Image",
+                  "url": "https://afpln.github.io/aFPLN/share/email/ico-uniform.png",
+                  "width": "40px",
+                  "height": "40px",
+                  "altText": "Uniform of the day"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "verticalContentAlignment": "Center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Uniform of the day",
+                  "weight": "Bolder",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "The uniform on your cadet as soon as it's posted.",
+                  "isSubtle": true,
+                  "spacing": "None",
+                  "wrap": true,
+                  "size": "Small"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Medium",
+          "selectAction": {
+            "type": "Action.OpenUrl",
+            "url": "https://afpln.github.io/aFPLN/#go=brief",
+            "tooltip": "Open Flight plan brief in FPLN"
+          },
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "Image",
+                  "url": "https://afpln.github.io/aFPLN/share/email/ico-brief.png",
+                  "width": "40px",
+                  "height": "40px",
+                  "altText": "Flight plan brief"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "verticalContentAlignment": "Center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Flight plan brief",
+                  "weight": "Bolder",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Your whole day read to you like a pilot's brief.",
+                  "isSubtle": true,
+                  "spacing": "None",
+                  "wrap": true,
+                  "size": "Small"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Medium",
+          "selectAction": {
+            "type": "Action.OpenUrl",
+            "url": "https://afpln.github.io/aFPLN/#go=home",
+            "tooltip": "Open Eric, your first officer in FPLN"
+          },
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "Image",
+                  "url": "https://afpln.github.io/aFPLN/share/email/ico-eric.png",
+                  "width": "40px",
+                  "height": "40px",
+                  "altText": "Eric, your first officer"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "stretch",
+              "verticalContentAlignment": "Center",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Eric, your first officer",
+                  "weight": "Bolder",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "Ask what's next or add a task in plain words.",
+                  "isSubtle": true,
+                  "spacing": "None",
+                  "wrap": true,
+                  "size": "Small"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "Get FPLN",
+      "url": "https://afpln.github.io/aFPLN/download/",
+      "style": "positive"
+    },
+    {
+      "type": "Action.ToggleVisibility",
+      "title": "What's inside",
+      "targetElements": [
+        "inside"
+      ]
+    },
+    {
+      "type": "Action.OpenUrl",
+      "title": "Open in browser",
+      "url": "https://afpln.github.io/aFPLN/"
+    }
+  ]
+}

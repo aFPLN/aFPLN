@@ -1,0 +1,21 @@
+How to post the interactive FPLN card in Teams
+==============================================
+Teams doesn't let you paste a card straight into a chat, so you post it once with a Teams Workflow
+(Power Automate). It takes about two minutes.
+
+1. In Teams, open Workflows (in the left bar, or search "Workflows" under Apps) and choose Create, then
+   start from blank ("Create from blank" or "Instant cloud flow" in Power Automate).
+2. Trigger: "Manually trigger a flow".
+3. Add an action: Microsoft Teams > "Post card in a chat or channel".
+     Post as: Flow bot
+     Post in: Channel (pick the team and channel), or Group chat
+     Adaptive Card: paste everything from card.json (the Copy card code button on the Teams page)
+4. Save, then press Test > Manually > Run flow. The card appears in the channel.
+
+What people see: the FPLN banner, a short intro and three buttons. "Get FPLN" opens the install page,
+"What's inside" opens the six features right inside the card (each one opens FPLN on that feature),
+and "Open in browser" opens FPLN.
+
+To check it before posting, paste card.json into the Adaptive Cards Designer (adaptivecards.io/designer)
+and pick Microsoft Teams as the host app.
+If your unit's Teams blocks Workflows, use the paste-in post instead; it needs no setup.

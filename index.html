@@ -2247,6 +2247,11 @@ window.FPLN_LAYOUT = (function(){
   setTimeout(fetchTeam, 1500); setInterval(fetchTeam, 30 * 60000);
   document.addEventListener("visibilitychange", function(){ if(!document.hidden && Date.now() - (fetchTeam.last || 0) > 10 * 60000) fetchTeam(); });
   setInterval(ring, 20000);
+  /* links like afpln.github.io/aFPLN/#go=tasks open FPLN on that page (used by the email tour and the Teams card) */
+  function goHash(){ var m = /[#&]go=(home|ops|tasks|opord|brief|map|set|x:[a-z0-9-]{1,24})(?:&|$)/.exec(location.hash); if(!m) return; var to = m[1];
+    try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
+    var n = 0; (function tryOpen(){ n++; try{ if(window.FPLN && FPLN.open && $("fHome") && $("fHome").contentDocument && $("fHome").contentDocument.readyState === "complete"){ FPLN.open(to); return; } }catch(e){} if(n < 40) setTimeout(tryOpen, 250); })(); }
+  setTimeout(goHash, 600); window.addEventListener("hashchange", goHash);
   return {apply:apply, paintHome:function(){ try{ paintHome(eff()); }catch(e){} }, tiles:tiles, open:open, showPage:showPage, hidePage:function(){ var v = $("vX"); if(v) v.hidden = true; curX = null; },
     arrange:openDlg, effective:eff, team:function(){ return TEAM; }, mine:function(){ return ME; },
     summary:function(){ return (TEAM ? "team " + (TEAM.sections || []).length + "x" : "default") + (Object.keys(ME).length ? "+own" : ""); }};

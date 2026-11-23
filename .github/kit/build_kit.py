@@ -1,6 +1,7 @@
 """Builds kit/FPLN-kit.zip: everything for FPLN in one download. Run from the repo root."""
-import io, os, re, zipfile, html, json
+import io, os, re, zipfile, html, json, runpy
 R = "."
+runpy.run_path(".github/kit/build_share.py")   # email tour + Teams pages, always current
 ZIP = "kit/FPLN-kit.zip"
 BASE = "https://afpln.github.io/aFPLN/"
 def url(name, target): return ("[InternetShortcut]\r\nURL=%s\r\nIconIndex=0\r\n" % target).encode()
@@ -70,6 +71,9 @@ Everything for FPLN in one place.
    badge.png, badge-gold.png ... install badges
    link-preview.png ............ what a pasted link looks like in chats
    Email banner.html ........... open it, click Copy banner, paste into any email (stays clickable)
+   Email tour.html ............. a clickable tour of FPLN for email: six features, each opens FPLN on it
+   Teams\\ ..................... open Teams.html: a paste-in post, announcement headers, and an
+                                 interactive Teams card (card.json + how to post it)
    message.txt ................. ready-made text to send people
 
 3 Links\\
@@ -88,6 +92,14 @@ for f in ["Install FPLN.cmd", "FPLN keep awake.cmd", "FPLN undo keep awake.cmd",
 for src, dst in [("share/fpln-reveal.jpg","FPLN-reveal.jpg"),("share/banner.png","banner.png"),("share/banner-email.png","email-picture.png"),("share/badge.png","badge.png"),("share/badge-gold.png","badge-gold.png"),("share/og.png","link-preview.png")]:
     files.append(("2 Share/" + dst, open(src, "rb").read()))
 files.append(("2 Share/Email banner.html", email.encode()))
+files.append(("2 Share/Email tour.html", open("share/tour.html", "rb").read()))
+files.append(("2 Share/Teams/Teams.html", open("share/teams.html", "rb").read()))
+for f in ["header-wide.png", "header-2x1.png", "card-preview.png"]:
+    files.append(("2 Share/Teams/teams/" + f, open("share/teams/" + f, "rb").read()))
+files.append(("2 Share/Teams/FPLN Teams header (wide).png", open("share/teams/header-wide.png", "rb").read()))
+files.append(("2 Share/Teams/FPLN Teams header (2x1).png", open("share/teams/header-2x1.png", "rb").read()))
+files.append(("2 Share/Teams/FPLN Teams card.json", open("share/teams/card.json", "rb").read()))
+files.append(("2 Share/Teams/How to post the Teams card.txt", open("share/teams/how-to-post-the-card.txt", encoding="utf-8").read().replace("\n", "\r\n").encode("utf-8-sig")))
 files.append(("2 Share/message.txt", msg.replace("\n", "\r\n").encode("utf-8-sig")))
 for name, u in [("FPLN app", ""), ("Install page", "get"), ("Share page", "share/"), ("Download machine", "kit/")]:
     files.append(("3 Links/%s.url" % name, url(name, BASE + u)))

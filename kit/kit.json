@@ -1,5 +1,5 @@
 {
- "bytes": 3933289,
+ "bytes": 4724858,
  "version": "0.13.0 beta 1 \u00b7 21 Nov 2026",
  "files": [
   "README.txt",
@@ -16,6 +16,15 @@
   "2 Share/badge-gold.png",
   "2 Share/link-preview.png",
   "2 Share/Email banner.html",
+  "2 Share/Email tour.html",
+  "2 Share/Teams/Teams.html",
+  "2 Share/Teams/teams/header-wide.png",
+  "2 Share/Teams/teams/header-2x1.png",
+  "2 Share/Teams/teams/card-preview.png",
+  "2 Share/Teams/FPLN Teams header (wide).png",
+  "2 Share/Teams/FPLN Teams header (2x1).png",
+  "2 Share/Teams/FPLN Teams card.json",
+  "2 Share/Teams/How to post the Teams card.txt",
   "2 Share/message.txt",
   "3 Links/FPLN app.url",
   "3 Links/Install page.url",
