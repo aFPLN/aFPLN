@@ -1,5 +1,5 @@
 {
- "bytes": 5052148,
+ "bytes": 7204687,
  "version": "0.13.0 beta 1 \u00b7 21 Nov 2026",
  "files": [
   "README.txt",
@@ -21,8 +21,6 @@
   "2 Share/Teams/teams/header-wide.png",
   "2 Share/Teams/teams/header-2x1.png",
   "2 Share/Teams/teams/card-preview.png",
-  "2 Share/Teams/FPLN Teams header (wide).png",
-  "2 Share/Teams/FPLN Teams header (2x1).png",
   "2 Share/Teams/FPLN Teams card.json",
   "2 Share/Teams/How to post the Teams card.txt",
   "2 Share/message.txt",

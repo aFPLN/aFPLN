@@ -96,8 +96,6 @@ files.append(("2 Share/Email tour.html", open("share/tour.html", "rb").read()))
 files.append(("2 Share/Teams/Teams.html", open("share/teams.html", "rb").read()))
 for f in ["header-wide.png", "header-2x1.png", "card-preview.png"]:
     files.append(("2 Share/Teams/teams/" + f, open("share/teams/" + f, "rb").read()))
-files.append(("2 Share/Teams/FPLN Teams header (wide).png", open("share/teams/header-wide.png", "rb").read()))
-files.append(("2 Share/Teams/FPLN Teams header (2x1).png", open("share/teams/header-2x1.png", "rb").read()))
 files.append(("2 Share/Teams/FPLN Teams card.json", open("share/teams/card.json", "rb").read()))
 files.append(("2 Share/Teams/How to post the Teams card.txt", open("share/teams/how-to-post-the-card.txt", encoding="utf-8").read().replace("\n", "\r\n").encode("utf-8-sig")))
 files.append(("2 Share/message.txt", msg.replace("\n", "\r\n").encode("utf-8-sig")))
